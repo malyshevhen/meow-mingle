@@ -3,7 +3,7 @@ package ua.mevhen.domain.model
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
-import jakarta.validation.constraints.NotNull
+import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
@@ -12,33 +12,25 @@ import org.springframework.data.mongodb.core.mapping.DocumentReference
 
 import java.time.LocalDate
 
-@Document(collection = "user")
+@Document(collection = 'post')
 @Builder
 @ToString
 @EqualsAndHashCode
-class User {
+class Post {
 
     @Id
     private String id
 
-    @NotNull
-    private String username
+    @CreatedBy
+    private User author
 
-    @NotNull
-    private String email
-
-    @NotNull
-    private String password
-
-    private String status
-
-    private String bio
+    private String content
 
     @DocumentReference
-    private Set<User> subscribers = new HashSet<>()
+    private Set<User> likes = new HashSet()
 
     @DocumentReference
-    private Set<User> subscriptions = new HashSet<>()
+    private Set<Comment> comments = new HashSet<>()
 
     @CreatedDate
     private LocalDate created

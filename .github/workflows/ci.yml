@@ -30,10 +30,10 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '17'
-          cache: maven
+          cache: gradle
 
       - name: Build .jar executable
-        run: ./mvnw clean install
+        run: ./gradlew clean bootJar
 
       - name: Set up QEMU
         uses: docker/setup-qemu-action@v2

@@ -1,5 +1,7 @@
 services:
+
   mongodb:
+    container_name: 'mongo-db-meow-mingle'
     image: 'mongo:latest'
     environment:
       - 'MONGO_INITDB_DATABASE=mydatabase'

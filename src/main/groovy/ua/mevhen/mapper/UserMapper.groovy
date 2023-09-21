@@ -1,21 +1,23 @@
 package ua.mevhen.mapper
 
-import org.mapstruct.Mapper
-import org.mapstruct.Mapping
+import org.springframework.stereotype.Component
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
 import ua.mevhen.domain.model.User
 
-@Mapper(componentModel = 'spring')
-interface UserMapper {
+@Component
+class UserMapper {
 
-    @Mapping(target = 'id', ignore = true)
-    @Mapping(target = 'subscribers', ignore = true)
-    @Mapping(target = 'subscriptions', ignore = true)
-    @Mapping(target = 'created', ignore = true)
-    @Mapping(target = 'updated', ignore = true)
-    User toUser(UserRegistration registration)
+    User toUser(UserRegistration registration) {
+        return new User(
+            username: registration.username(),
+            email: registration.email(),
+            password: registration.password())
+    }
 
-    UserInfo toUserInfo(User user)
-
+    UserInfo toUserInfo(User user) {
+        return new UserInfo(
+            id: user.id,
+            username: user.username)
+    }
 }

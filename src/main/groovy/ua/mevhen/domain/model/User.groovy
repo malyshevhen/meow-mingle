@@ -2,45 +2,47 @@ package ua.mevhen.domain.model
 
 import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
+import groovy.transform.builder.Builder
 import jakarta.validation.constraints.NotNull
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.Id
 import org.springframework.data.annotation.LastModifiedDate
-import org.springframework.data.mongodb.core.mapping.DBRef
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.DocumentReference
 
 import java.time.LocalDate
 
 @Document(collection = "user")
+@Builder
 @ToString
 @EqualsAndHashCode
 class User {
 
     @Id
-    String id
+    private String id
 
     @NotNull
-    String username
+    private String username
 
     @NotNull
-    String email
+    private String email
 
     @NotNull
-    String password
+    private String password
 
-    String status
+    private String status
 
-    String bio
+    private String bio
 
-    @DBRef
-    Set<User> subscribers = []
+    @DocumentReference
+    private Set<User> subscribers = new HashSet<>()
 
-    @DBRef
-    Set<User> subscriptions = []
+    @DocumentReference
+    private Set<User> subscriptions = new HashSet<>()
 
     @CreatedDate
-    LocalDate created
+    private LocalDate created
 
     @LastModifiedDate
-    LocalDate updated
+    private LocalDate updated
 }

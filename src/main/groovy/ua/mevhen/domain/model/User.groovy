@@ -41,4 +41,10 @@ class User {
 
     @LastModifiedDate
     private LocalDate updated
+
+    User(Map args) {
+        this.username = args.username
+        this.email = args.email
+        this.password = args.password
+    }
 }

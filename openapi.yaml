@@ -1,0 +1,122 @@
+openapi: 3.0.3
+info:
+  title: Meow Mingle
+  description: Twitter-like social media API
+  contact:
+    name: Evhen Malysh
+    email: malysh.evgeniy@gmail.com
+    url: https://github.com/MalyshEvhen
+  version: 0.0.1-SNAPSHOT
+servers:
+  - url: /api/v1
+paths:
+  '/user':
+    post:
+      tags:
+        - User Registration Form
+      description: register new user
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistrationForm'
+        description: User registration parameters
+        required: true
+      responses:
+        '201':
+          description: Created
+        '400':
+          description: Bad Request
+        '500':
+          description: Internal Server Error
+    put:
+      tags:
+        - User Update Form
+      description: Update existing user
+      operationId: update
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserUpdateForm'
+        description: User update parameters
+        required: true
+      responses:
+        '200':
+          description: Updated
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+  '/user/{id}':
+    parameters:
+      - name: id
+        description: User Id
+        in: path
+        required: true
+        schema:
+          type: string
+    delete:
+      tags:
+        - User Unique Identifier
+      description: Delete existing user
+      operationId: delete
+      responses:
+        '204':
+          description: No Content
+        '400':
+          description: Bad Request
+        '404':
+          description: Not Found
+        '500':
+          description: Internal Server Error
+components:
+  schemas:
+    UserRegistrationForm:
+      description: |
+        Request to register new user
+      type: object
+      required:
+        - username
+        - email
+        - password
+      properties:
+        username:
+          description: Username of the user
+          type: string
+          minLength: 3
+          maxLength: 30
+        email:
+          description: Account email
+          type: string
+          minLength: 5
+          maxLength: 100
+          pattern: '^[\w\.-]+@[\w\.-]+\.\w+$'
+        password:
+          description: Account password
+          type: string
+          minLength: 8
+          maxLength: 100
+          pattern: '^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}$'
+    UserUpdateForm:
+      description: |
+        Request to update existing user
+      type: object
+      required:
+        - id
+        - username
+      properties:
+        username:
+          description: Username of the user
+          type: string
+          minLength: 3
+          maxLength: 30
+        email:
+          description: Account email
+          type: string
+          minLength: 5
+          maxLength: 100
+          pattern: '^[\w\.-]+@[\w\.-]+\.\w+$'

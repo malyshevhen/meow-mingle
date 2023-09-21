@@ -33,10 +33,10 @@ class User {
     String bio
 
     @DBRef
-    Set<User> subscribers
+    Set<User> subscribers = []
 
     @DBRef
-    Set<User> subscriptions
+    Set<User> subscriptions = []
 
     @CreatedDate
     LocalDate created

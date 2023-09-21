@@ -30,10 +30,6 @@ class User {
     @NotNull
     private String password
 
-    private String status
-
-    private String bio
-
     @DocumentReference
     private Set<User> subscribers = new HashSet<>()
 

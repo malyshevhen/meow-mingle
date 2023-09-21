@@ -14,15 +14,18 @@ class UserServiceImpl implements UserService {
     private final UserRepository userRepository
     private final UserMapper userMapper
 
-    UserServiceImpl(UserRepository userRepository, UserMapper userMapper) {
+    UserServiceImpl(
+        UserRepository userRepository,
+        UserMapper userMapper
+    ) {
         this.userRepository = userRepository
         this.userMapper = userMapper
     }
 
     @Override
     @Transactional
-    UserInfo save(UserRegistration rerForm) {
-        def userToSave = userMapper.toUser(rerForm)
+    UserInfo save(UserRegistration regForm) {
+        def userToSave = userMapper.toUser(regForm)
         def savedUser = userRepository.save(userToSave)
         return userMapper.toUserInfo(savedUser)
     }

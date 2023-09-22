@@ -10,9 +10,9 @@ class UserMapper {
 
     User toUser(UserRegistration registration) {
         return new User(
-            username: registration.username(),
-            email: registration.email(),
-            password: registration.password())
+            username: registration.username,
+            email: registration.email,
+            password: registration.password)
     }
 
     UserInfo toUserInfo(User user) {

@@ -47,4 +47,20 @@ class User {
         this.email = args.email
         this.password = args.password
     }
+
+    def addSubscriber = { User u -> this.subscribers.add(u) }
+    def subscribe = { User u ->
+        {
+            u.addSubscriber(this)
+            this.subscriptions.add(u)
+        }
+    }
+    def removeSubscriber = { User u -> this.subscribers.removeIf { it.id == u.id } }
+    def unsubscribe = { User u ->
+        {
+            u.removeSubscriber(this)
+            this.subscriptions.removeIf { it.id == u.id }
+        }
+    }
+
 }

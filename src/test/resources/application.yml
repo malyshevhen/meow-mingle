@@ -1,0 +1,8 @@
+spring:
+  application:
+    name: 'meow-mingle'
+  data:
+    mongodb:
+      database: 'meow-mingle'
+      host: localhost
+      port: 27017

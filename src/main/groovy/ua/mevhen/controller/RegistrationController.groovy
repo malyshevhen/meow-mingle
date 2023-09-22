@@ -1,16 +1,11 @@
 package ua.mevhen.controller
 
 import jakarta.validation.Valid
-import org.springframework.validation.BindingResult
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.http.HttpStatus
+import org.springframework.web.bind.annotation.*
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
 import ua.mevhen.service.UserService
-
-import static ua.mevhen.util.ValidationUtils.handleFieldsErrors
 
 @RestController
 @RequestMapping('/api/user/register')
@@ -23,11 +18,9 @@ class RegistrationController {
     }
 
     @PostMapping
-    UserInfo register(
-        @Valid @RequestBody UserRegistration regForm,
-        BindingResult bindingResult
-    ) {
-        handleFieldsErrors(bindingResult)
+    @ResponseStatus(HttpStatus.CREATED)
+    UserInfo register(@RequestBody @Valid UserRegistration regForm) {
         return userService.save(regForm)
     }
+
 }

@@ -12,7 +12,6 @@ import ua.mevhen.service.UserService
 
 import static org.mockito.Mockito.when
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @WebMvcTest([RegistrationController])
@@ -52,13 +51,13 @@ class RegistrationControllerSpec extends Specification {
     def "test register with invalid registration data"() {
         given: 'Invalid email and password in form'
         def invalidRegistration = new UserRegistration(
-            username: "testUser",
-            email: "invalid-email", // Invalid email format
-            password: "short" // Password too short
+            username: 'testUser',
+            email: 'invalid-email',
+            password: 'short'
         )
 
         when: 'Perform registration'
-        def result = mockMvc.perform(post("/api/user/register")
+        def result = mockMvc.perform(post('/api/user/register')
             .contentType('application/json')
             .content(mapper.writeValueAsString(invalidRegistration)))
 

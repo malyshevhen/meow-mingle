@@ -1,11 +1,10 @@
 package ua.mevhen.service
 
+import org.springframework.beans.factory.annotation.Autowired
+
 class UserServiceSpec extends AbstractIntegrationSpec {
 
-    private final UserService userService
-
-    UserServiceSpec(UserService userService) {
-        this.userService = userService
-    }
+    @Autowired
+    private UserService userService
 
 }

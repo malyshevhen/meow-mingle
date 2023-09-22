@@ -41,7 +41,7 @@ class UserMapperSpec extends Specification {
         UserInfo userInfo = userMapper.toUserInfo(user)
 
         then:
-        userInfo.id == user.id
+        userInfo.id == user.id.toString()
         userInfo.username == user.username
     }
 }

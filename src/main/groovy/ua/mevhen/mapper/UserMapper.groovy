@@ -17,7 +17,7 @@ class UserMapper {
 
     UserInfo toUserInfo(User user) {
         return new UserInfo(
-            id: user.id,
+            id: user.id.toString(),
             username: user.username)
     }
 }

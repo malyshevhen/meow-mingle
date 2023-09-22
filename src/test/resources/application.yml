@@ -6,3 +6,6 @@ spring:
       database: 'meow-mingle'
       host: localhost
       port: 27017
+      authentication-database: admin
+      username: user
+      password: password

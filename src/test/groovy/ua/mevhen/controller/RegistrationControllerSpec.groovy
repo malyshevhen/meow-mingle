@@ -1,17 +1,16 @@
 package ua.mevhen.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
+import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
-import org.springframework.boot.test.mock.mockito.MockBean
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
 import ua.mevhen.service.UserService
 
-import static org.mockito.Mockito.when
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
@@ -26,8 +25,8 @@ class RegistrationControllerSpec extends Specification {
     @Autowired
     private ObjectMapper mapper
 
-    @MockBean
-    private UserService userService
+    @SpringBean
+    private UserService userService = Mock(UserService)
 
     def "test register with valid registration data"() {
         given: 'Valid user registration DTO'
@@ -37,8 +36,7 @@ class RegistrationControllerSpec extends Specification {
             password: "Password123"
         )
 
-        def userInfo = new UserInfo(id: '1', username: 'testUser')
-        when(userService.save(validRegistration)).thenReturn(userInfo)
+        userService.save(validRegistration) >> new UserInfo(id: "1", username: "testUser")
 
         when: 'Perform registration'
         def result = mockMvc.perform(post('/api/user/register')
@@ -46,9 +44,7 @@ class RegistrationControllerSpec extends Specification {
             .content(mapper.writeValueAsString(validRegistration)))
 
         then: 'Expect: status is 201, ID is generated, username is correct'
-        result.andExpect(status().isCreated())
-//        jsonPath(/$.id/).value('1'),
-//        jsonPath(/$.username/).value('testUser')
+        result.andExpectAll(status().isCreated())
     }
 
     def "test register with invalid registration data"() {

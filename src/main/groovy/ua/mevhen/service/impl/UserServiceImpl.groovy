@@ -1,6 +1,9 @@
 package ua.mevhen.service.impl
 
 import org.bson.types.ObjectId
+import org.springframework.security.core.userdetails.UserDetails
+import org.springframework.security.core.userdetails.UserDetailsService
+import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ua.mevhen.domain.dto.UserInfo
@@ -12,7 +15,7 @@ import ua.mevhen.repository.UserRepository
 import ua.mevhen.service.UserService
 
 @Service
-class UserServiceImpl implements UserService {
+class UserServiceImpl implements UserService, UserDetailsService {
 
     private final UserRepository userRepository
     private final UserMapper userMapper
@@ -27,7 +30,7 @@ class UserServiceImpl implements UserService {
 
     @Override
     User findById(String id) {
-        userRepository.findById(id)
+        userRepository.findById(new ObjectId(id))
             .orElseThrow { -> new UserNotFoundException("User with id: $id was not found.") }
     }
 
@@ -52,25 +55,11 @@ class UserServiceImpl implements UserService {
     @Transactional
     void deleteById(String id) {
         def user = findById(id)
-        user.subscribers.each { unsubscribe(it, user.id) }
         userRepository.delete(user)
     }
 
-    private subscribe(String userId, String subId) {
-        def user = findById(userId)
-        def subscription = findById(subId)
-
-        user.subscribe(subscription)
-
-        userRepository.saveAll { [user, subscription] }
-    }
-
-    private unsubscribe(ObjectId userId, ObjectId subscrId) {
-        def user = findById(userId)
-        def subscription = findById(subscrId)
-
-        user.unsubscribe(subscription)
-
-        userRepository.saveAll { [user, subscription] }
+    @Override
+    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        return userRepository.findByEmail(username)
     }
 }

@@ -4,6 +4,7 @@ import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
 import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spock.lang.Specification
@@ -24,6 +25,7 @@ class UserControllerSpec extends Specification {
     @SpringBean
     UserService userService = Mock(UserService)
 
+    @WithMockUser
     def "test updateUsername endpoint"() {
         given:
         def userId = 'user123'
@@ -43,6 +45,7 @@ class UserControllerSpec extends Specification {
             .andExpect(jsonPath('$.username').value(newUsername))
     }
 
+    @WithMockUser
     def "test delete endpoint"() {
         given:
         def userId = 'user123'

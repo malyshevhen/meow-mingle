@@ -27,10 +27,10 @@ class Post {
 
     private String content
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private Set<User> likes = new HashSet()
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private Set<Comment> comments = new HashSet<>()
 
     @CreatedDate

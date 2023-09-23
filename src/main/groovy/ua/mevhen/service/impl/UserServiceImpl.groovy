@@ -39,6 +39,12 @@ class UserServiceImpl implements UserService {
     }
 
     @Override
+    User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow { -> new UserNotFoundException("User: '$username' was not found.") }
+    }
+
+    @Override
     @Transactional
     UserInfo updateUsername(String id, String username) {
         def user = findById(id)
@@ -79,11 +85,6 @@ class UserServiceImpl implements UserService {
         def updatedUsers = userRepository.saveAll { [user, sub] }
 
         return updatedUsers.collect { userMapper.toUserInfo(it) }
-    }
-
-    private User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-            .orElseThrow { -> new UserNotFoundException("User: '$username' was not found.") }
     }
 
     private User findById(String id) {

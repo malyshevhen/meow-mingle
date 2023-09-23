@@ -11,11 +11,12 @@ import spock.lang.Specification
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.service.UserService
 
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc
 class UserControllerSpec extends Specification {
 
@@ -35,7 +36,7 @@ class UserControllerSpec extends Specification {
         userService.updateUsername(userId, newUsername) >> userInfo
 
         when:
-        def result = mockMvc.perform(put("/api/user/{id}", userId)
+        def result = mockMvc.perform(put("/api/user/$userId")
             .param("username", newUsername)
             .contentType('application/json'))
 
@@ -51,7 +52,7 @@ class UserControllerSpec extends Specification {
         def userId = 'user123'
 
         when:
-        def result = mockMvc.perform(delete("/api/user/{id}", userId))
+        def result = mockMvc.perform(delete("/api/user/$userId"))
 
         then:
         result.andExpect(MockMvcResultMatchers.status().isNoContent())

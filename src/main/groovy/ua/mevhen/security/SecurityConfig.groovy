@@ -1,4 +1,4 @@
-package ua.mevhen.config
+package ua.mevhen.security
 
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration

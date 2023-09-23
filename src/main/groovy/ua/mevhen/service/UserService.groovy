@@ -2,11 +2,8 @@ package ua.mevhen.service
 
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
-import ua.mevhen.domain.model.User
 
 interface UserService {
-
-    User findById(String id)
 
     UserInfo save(UserRegistration rerForm)
 
@@ -14,4 +11,7 @@ interface UserService {
 
     void deleteById(String id)
 
+    Collection<UserInfo> subscribe(String username, String subId)
+
+    Collection<UserInfo> unsubscribe(String username, String subId)
 }

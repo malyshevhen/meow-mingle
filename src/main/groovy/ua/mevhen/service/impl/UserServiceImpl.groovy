@@ -1,21 +1,19 @@
 package ua.mevhen.service.impl
 
 import org.bson.types.ObjectId
-import org.springframework.security.core.userdetails.UserDetails
-import org.springframework.security.core.userdetails.UserDetailsService
-import org.springframework.security.core.userdetails.UsernameNotFoundException
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
 import ua.mevhen.domain.model.User
+import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.mapper.UserMapper
 import ua.mevhen.repository.UserRepository
 import ua.mevhen.service.UserService
 
 @Service
-class UserServiceImpl implements UserService, UserDetailsService {
+class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository
     private final UserMapper userMapper
@@ -29,14 +27,12 @@ class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    User findById(String id) {
-        userRepository.findById(new ObjectId(id))
-            .orElseThrow { -> new UserNotFoundException("User with id: $id was not found.") }
-    }
-
-    @Override
     @Transactional
     UserInfo save(UserRegistration regForm) {
+        def username = regForm.username
+        if (ifExists(username)) {
+            throw new UserAlreadyExistsException("Username: '$username' is taken.")
+        }
         def userToSave = userMapper.toUser(regForm)
         def savedUser = userRepository.save(userToSave)
         return userMapper.toUserInfo(savedUser)
@@ -59,7 +55,44 @@ class UserServiceImpl implements UserService, UserDetailsService {
     }
 
     @Override
-    UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return userRepository.findByEmail(username)
+    @Transactional
+    List<UserInfo> subscribe(String username, String subId) {
+        return updateSubscriptions(username, subId) { user, sub -> user.subscribe(sub) }
     }
+
+    @Override
+    @Transactional
+    List<UserInfo> unsubscribe(String username, String subId) {
+        return updateSubscriptions(username, subId) { user, sub -> user.unsubscribe(sub) }
+    }
+
+    private List<UserInfo> updateSubscriptions(
+        String username,
+        String subId,
+        Closure<User> subscriptionAction
+    ) {
+        def user = findByUsername(username)
+        def sub = findById(subId)
+
+        subscriptionAction(user, sub)
+
+        def updatedUsers = userRepository.saveAll { [user, sub] }
+
+        return updatedUsers.collect { userMapper.toUserInfo(it) }
+    }
+
+    private User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow { -> new UserNotFoundException("User: '$username' was not found.") }
+    }
+
+    private User findById(String id) {
+        userRepository.findById(new ObjectId(id))
+            .orElseThrow { -> new UserNotFoundException("User with id: $id was not found.") }
+    }
+
+    private boolean ifExists(String username) {
+        userRepository.existsByUsername(username)
+    }
+
 }

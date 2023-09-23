@@ -4,10 +4,10 @@ import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import org.bson.types.ObjectId
-import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.Document
+import org.springframework.data.mongodb.core.mapping.DocumentReference
 import org.springframework.data.mongodb.core.mapping.MongoId
 
 import java.time.LocalDate
@@ -21,8 +21,8 @@ class Comment {
     @MongoId
     private ObjectId id
 
-    @CreatedBy
-    private ObjectId author
+    @DocumentReference
+    private User author
 
     private String content
 

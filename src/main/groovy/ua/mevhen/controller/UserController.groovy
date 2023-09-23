@@ -1,5 +1,6 @@
 package ua.mevhen.controller
 
+import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -12,7 +13,7 @@ import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.service.UserService
 
 @RestController
-@RequestMapping('/api/user/')
+@RequestMapping('/api/user')
 class UserController {
 
     private final UserService userService
@@ -23,15 +24,15 @@ class UserController {
 
     @PutMapping('/{id}')
     UserInfo updateUsername(
-        @PathVariable('id') String userId,
-        @RequestParam('username') String username
+        @PathVariable('id') @NotBlank String userId,
+        @RequestParam('username') @NotBlank String username
     ) {
         return userService.updateUsername(userId, username)
     }
 
     @DeleteMapping('/{id}')
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    void delete(@PathVariable('id') String userId) {
+    void delete(@PathVariable('id') @NotBlank String userId) {
         userService.deleteById(userId)
     }
 

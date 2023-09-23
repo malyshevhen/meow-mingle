@@ -9,6 +9,9 @@ import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.MongoId
+import org.springframework.security.core.GrantedAuthority
+import org.springframework.security.core.authority.SimpleGrantedAuthority
+import org.springframework.security.core.userdetails.UserDetails
 
 import java.time.LocalDate
 
@@ -16,7 +19,7 @@ import java.time.LocalDate
 @Builder
 @ToString
 @EqualsAndHashCode
-class User {
+class User implements UserDetails {
 
     @MongoId
     private ObjectId id
@@ -30,9 +33,11 @@ class User {
     @NotNull
     private String password
 
-    private Set<ObjectId> subscribers = new HashSet<>()
+    private String role
 
-    private Set<ObjectId> subscriptions = new HashSet<>()
+    private Set<String> subscriptions = new HashSet<>()
+
+    private Set<String> subscribers = new HashSet<>()
 
     @CreatedDate
     private LocalDate created
@@ -40,27 +45,38 @@ class User {
     @LastModifiedDate
     private LocalDate updated
 
-    User() {}
-
-    User(Map args) {
-        this.username = args.username
-        this.email = args.email
-        this.password = args.password
+    @Override
+    Collection<? extends GrantedAuthority> getAuthorities() {
+        return [new SimpleGrantedAuthority(this.role)]
     }
 
-    def addSubscriber = { User u -> this.subscribers.add(u.id) }
-    def subscribe = { User u ->
-        {
-            u.addSubscriber(this)
-            this.subscriptions.add(u.id)
-        }
-    }
-    def removeSubscriber = { User u -> this.subscribers.removeIf { it == u.id } }
-    def unsubscribe = { User u ->
-        {
-            u.removeSubscriber(this)
-            this.subscriptions.removeIf { it == u.id }
-        }
+    @Override
+    String getPassword() {
+        return this.password
     }
 
+    @Override
+    String getUsername() {
+        return this.username
+    }
+
+    @Override
+    boolean isAccountNonExpired() {
+        return true
+    }
+
+    @Override
+    boolean isAccountNonLocked() {
+        return true
+    }
+
+    @Override
+    boolean isCredentialsNonExpired() {
+        return true
+    }
+
+    @Override
+    boolean isEnabled() {
+        return true
+    }
 }

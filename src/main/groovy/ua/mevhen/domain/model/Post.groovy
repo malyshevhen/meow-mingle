@@ -23,15 +23,13 @@ class Post {
     private ObjectId id
 
     @CreatedBy
-    private User author
+    private ObjectId author
 
     private String content
 
-    @DocumentReference
-    private Set<User> likes = new HashSet()
+    private Set<ObjectId> likes = new HashSet()
 
-    @DocumentReference
-    private Set<Comment> comments = new HashSet<>()
+    private Set<ObjectId> comments = new HashSet<>()
 
     @CreatedDate
     private LocalDate created

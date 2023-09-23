@@ -22,7 +22,7 @@ class Comment {
     private ObjectId id
 
     @CreatedBy
-    private User author
+    private ObjectId author
 
     private String content
 

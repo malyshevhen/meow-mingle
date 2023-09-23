@@ -22,14 +22,16 @@ class Post {
     @MongoId
     private ObjectId id
 
-    @CreatedBy
-    private ObjectId author
+    @DocumentReference
+    private User author
 
     private String content
 
-    private Set<ObjectId> likes = new HashSet()
+    @DocumentReference
+    private Set<User> likes = new HashSet()
 
-    private Set<ObjectId> comments = new HashSet<>()
+    @DocumentReference
+    private Set<Comment> comments = new HashSet<>()
 
     @CreatedDate
     private LocalDate created

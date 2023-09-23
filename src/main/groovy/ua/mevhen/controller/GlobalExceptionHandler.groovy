@@ -9,6 +9,8 @@ import org.springframework.web.bind.annotation.ExceptionHandler
 import org.springframework.web.bind.annotation.RestControllerAdvice
 import org.springframework.web.context.request.WebRequest
 import org.springframework.web.servlet.mvc.method.annotation.ResponseEntityExceptionHandler
+import ua.mevhen.exceptions.PermissionDeniedException
+import ua.mevhen.exceptions.PostNotFoundException
 import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
 
@@ -30,7 +32,8 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler([
         UserNotFoundException,
-        UsernameNotFoundException
+        UsernameNotFoundException,
+        PostNotFoundException
     ])
     protected final ResponseEntity handleNotFound(
         final RuntimeException ex,
@@ -40,4 +43,12 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
             new HttpHeaders(), HttpStatus.NOT_FOUND, request)
     }
 
+    @ExceptionHandler([PermissionDeniedException])
+    protected final ResponseEntity handleForbidden(
+        final RuntimeException ex,
+        final WebRequest request
+    ) {
+        return handleExceptionInternal(ex, ex.getMessage(),
+            new HttpHeaders(), HttpStatus.FORBIDDEN, request)
+    }
 }

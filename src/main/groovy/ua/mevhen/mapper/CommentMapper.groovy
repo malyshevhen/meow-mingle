@@ -10,8 +10,8 @@ class CommentMapper {
 
     CommentResponse toResponse(Comment comment) {
         return new CommentResponse(
-            id: comment.id,
-            authorId: comment.author.id,
+            id: comment.id.toString(),
+            authorId: comment.author.id.toString(),
             content: comment.content,
             created: comment.created,
             updated: comment?.updated

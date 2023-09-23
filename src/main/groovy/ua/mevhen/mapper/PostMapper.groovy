@@ -26,8 +26,8 @@ class PostMapper {
             .collect { commentMapper.toResponse(it) }
 
         return new PostResponse(
-            id: post.id,
-            authorId: post.author.id,
+            id: post.id.toString(),
+            authorId: post.author.id.toString(),
             content: post.content,
             likes: likes,
             comments: comments,

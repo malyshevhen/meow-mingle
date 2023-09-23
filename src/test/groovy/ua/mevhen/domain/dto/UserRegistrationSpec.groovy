@@ -68,4 +68,3 @@ class UserRegistrationSpec extends Specification {
         violations.find { it.propertyPath.toString() == "password" } != null
     }
 }
-

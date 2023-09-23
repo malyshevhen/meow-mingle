@@ -3,9 +3,4 @@ spring:
     name: 'meow-mingle'
   data:
     mongodb:
-      database: 'meow-mingle'
-      host: localhost
-      port: 27017
-      authentication-database: admin
-      username: user
-      password: password
+      uri: 'mongodb://localhost:27017/meow-mingle'

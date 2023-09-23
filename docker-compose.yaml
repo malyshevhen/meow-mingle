@@ -2,10 +2,10 @@ services:
 
   mongodb:
     container_name: 'mongo-db-meow-mingle'
-    image: 'mongo:latest'
+    image: 'mongo:6.0'
     environment:
-      - 'MONGO_INITDB_DATABASE=mydatabase'
-      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
+      - 'MONGO_INITDB_DATABASE=meow-mingle'
       - 'MONGO_INITDB_ROOT_USERNAME=root'
+      - 'MONGO_INITDB_ROOT_PASSWORD=secret'
     ports:
       - '27017'

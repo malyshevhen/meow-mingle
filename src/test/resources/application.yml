@@ -1,0 +1,6 @@
+spring:
+  application:
+    name: 'meow-mingle'
+  data:
+    mongodb:
+      uri: 'mongodb://localhost:27017/meow-mingle'

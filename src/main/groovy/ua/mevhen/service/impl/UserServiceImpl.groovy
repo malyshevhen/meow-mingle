@@ -1,5 +1,6 @@
 package ua.mevhen.service.impl
 
+import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ua.mevhen.domain.dto.UserInfo
@@ -51,20 +52,20 @@ class UserServiceImpl implements UserService {
     @Transactional
     void deleteById(String id) {
         def user = findById(id)
-        user.subscribers.each { unsubscribe(it.id, user.id) }
+        user.subscribers.each { unsubscribe(it, user.id) }
         userRepository.delete(user)
     }
 
-    private subscribe(String userId, String subscrId) {
+    private subscribe(String userId, String subId) {
         def user = findById(userId)
-        def subscription = findById(subscrId)
+        def subscription = findById(subId)
 
         user.subscribe(subscription)
 
         userRepository.saveAll { [user, subscription] }
     }
 
-    private unsubscribe(String userId, String subscrId) {
+    private unsubscribe(ObjectId userId, ObjectId subscrId) {
         def user = findById(userId)
         def subscription = findById(subscrId)
 

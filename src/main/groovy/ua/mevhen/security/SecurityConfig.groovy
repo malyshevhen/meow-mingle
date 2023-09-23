@@ -17,6 +17,7 @@ class SecurityConfig {
             .authorizeHttpRequests {
                 it.requestMatchers('/api/user/register').permitAll()
                 it.requestMatchers('/api/user/**').hasRole('USER')
+                it.requestMatchers('/api/posts/**').hasRole('USER')
                 it.anyRequest().authenticated()
             }
             .build()

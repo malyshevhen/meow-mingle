@@ -47,7 +47,12 @@ class UserServiceIntegrationSpec extends Specification {
 
         then:
         savedUserInfo.username == 'testUser'
+        savedUserInfo.id != null
+        !savedUserInfo.id.isBlank()
         foundUserInfo.username == 'testUser'
+
+        cleanup:
+        userService.deleteById(savedUserInfo.id)
     }
 
     def "test updateUsername operation"() {
@@ -68,6 +73,9 @@ class UserServiceIntegrationSpec extends Specification {
 
         then:
         updatedUserInfo.username == newUsername
+
+        cleanup:
+        userService.deleteById(savedUserInfo.id)
     }
 
     def "test deleteById operation"() {
@@ -87,4 +95,5 @@ class UserServiceIntegrationSpec extends Specification {
         then:
         thrown UserNotFoundException
     }
+
 }

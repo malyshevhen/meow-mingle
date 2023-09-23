@@ -7,11 +7,9 @@ import jakarta.validation.constraints.NotNull
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.annotation.Transient
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.MongoId
-import org.springframework.security.core.GrantedAuthority
-import org.springframework.security.core.authority.SimpleGrantedAuthority
-import org.springframework.security.core.userdetails.UserDetails
 
 import java.time.LocalDate
 
@@ -19,7 +17,7 @@ import java.time.LocalDate
 @Builder
 @ToString
 @EqualsAndHashCode
-class User implements UserDetails {
+class User {
 
     @MongoId
     private ObjectId id
@@ -45,38 +43,26 @@ class User implements UserDetails {
     @LastModifiedDate
     private LocalDate updated
 
-    @Override
-    Collection<? extends GrantedAuthority> getAuthorities() {
-        return [new SimpleGrantedAuthority(this.role)]
+    @Transient
+    def subscribe = { User sub ->
+        sub.addSubscriber(this)
+        this.subscriptions.add(sub.id.toString())
     }
 
-    @Override
-    String getPassword() {
-        return this.password
+    @Transient
+    private def addSubscriber = { User u ->
+        this.subscribers.add(u.id.toString())
     }
 
-    @Override
-    String getUsername() {
-        return this.username
+    @Transient
+    def unsubscribe = { User sub ->
+        sub.removeSubscriber(this)
+        this.subscriptions.removeIf { it == sub.id.toString() }
     }
 
-    @Override
-    boolean isAccountNonExpired() {
-        return true
+    @Transient
+    private def removeSubscriber(User u) {
+        this.subscribers.removeIf { it == u.id.toString() }
     }
 
-    @Override
-    boolean isAccountNonLocked() {
-        return true
-    }
-
-    @Override
-    boolean isCredentialsNonExpired() {
-        return true
-    }
-
-    @Override
-    boolean isEnabled() {
-        return true
-    }
 }

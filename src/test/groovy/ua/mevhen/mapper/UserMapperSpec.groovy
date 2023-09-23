@@ -1,5 +1,6 @@
 package ua.mevhen.mapper
 
+import org.bson.types.ObjectId
 import spock.lang.Specification
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
@@ -12,9 +13,9 @@ class UserMapperSpec extends Specification {
     def "test mapping UserRegistration to User"() {
         given:
         UserRegistration registration = new UserRegistration(
-            username: "testUser",
-            email: "test@example.com",
-            password: "password123"
+            username: 'testUser',
+            email: 'test@example.com',
+            password: 'password123'
         )
 
         when:
@@ -30,11 +31,11 @@ class UserMapperSpec extends Specification {
 
     def "test mapping User to UserInfo"() {
         given:
-        User user = new User(
-            id: "123",
-            username: "testUser",
-            email: "test@example.com",
-            password: "password123"
+        def user = new User(
+            id: new ObjectId(),
+            username: 'testUser',
+            email: 'test@example.com',
+            password: 'password123'
         )
 
         when:

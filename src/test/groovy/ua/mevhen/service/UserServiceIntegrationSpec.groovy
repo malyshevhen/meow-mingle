@@ -12,9 +12,10 @@ import spock.lang.Specification
 import ua.mevhen.domain.dto.UserRegistration
 import ua.mevhen.exceptions.UserNotFoundException
 
+import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.NONE
 import static org.testcontainers.utility.DockerImageName.parse
 
-@SpringBootTest
+@SpringBootTest(webEnvironment = NONE)
 @Testcontainers
 class UserServiceIntegrationSpec extends Specification {
 

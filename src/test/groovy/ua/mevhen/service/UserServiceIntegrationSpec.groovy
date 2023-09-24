@@ -3,6 +3,7 @@ package ua.mevhen.service
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
 import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.repository.UserRepository
 
@@ -37,6 +38,12 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
         then:
         user.role == 'USER'
         user.created != null
+
+        when:
+        userService.save(registration)
+
+        then:
+        thrown UserAlreadyExistsException
 
         cleanup:
         userService.deleteById(savedUserInfo.id)

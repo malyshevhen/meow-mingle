@@ -8,8 +8,8 @@ import org.springframework.data.mongodb.repository.config.EnableMongoRepositorie
 @EnableMongoRepositories
 class MeowMingleApplication {
 
-	static void main(String[] args) {
-		SpringApplication.run(MeowMingleApplication, args)
-	}
+    static void main(String[] args) {
+        SpringApplication.run(MeowMingleApplication, args)
+    }
 
 }

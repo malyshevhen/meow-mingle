@@ -1,5 +1,6 @@
 package ua.mevhen.service.impl
 
+import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,6 +15,7 @@ import ua.mevhen.service.PostService
 import ua.mevhen.service.UserService
 
 @Service
+@Slf4j
 class PostServiceImpl implements PostService {
 
     private final PostRepository postRepository
@@ -37,7 +39,7 @@ class PostServiceImpl implements PostService {
         def post = postMapper.toPost(request)
         post.author = user
         def savedPost = postRepository.save(post)
-
+        log.info("Saved post with ID: ${ savedPost.id } by user: $username")
         return postMapper.toResponse(savedPost)
     }
 
@@ -49,11 +51,12 @@ class PostServiceImpl implements PostService {
         if (post.author.username == username) {
             post.content = request.content
             def updatedPost = postRepository.save(post)
-
+            log.info("Updated post with ID: ${ updatedPost.id } by user: $username")
             return postMapper.toResponse(updatedPost)
         } else {
-            throw new PermissionDeniedException("User $username can`t change the post." +
-                " Permission denied.")
+            final message = "User $username can't change the post with ID: $id. Permission denied."
+            log.error(message)
+            throw new PermissionDeniedException(message)
         }
     }
 
@@ -64,15 +67,21 @@ class PostServiceImpl implements PostService {
 
         if (post.author.username == username) {
             postRepository.delete(post)
+            log.info("Deleted post with ID: $id by user: $username")
         } else {
-            throw new PermissionDeniedException("User $username can`t delete the post." +
-                " Permission denied.")
+            final message = "User $username can't delete the post with ID: $id. Permission denied."
+            log.error(message)
+            throw new PermissionDeniedException(message)
         }
     }
 
     private Post findById(String id) {
         postRepository.findById(new ObjectId(id))
-            .orElseThrow { -> new PostNotFoundException("Post with ID: $id not exist.") }
+            .orElseThrow { ->
+                final message = "Post with ID: $id not found."
+                log.error(message)
+                new PostNotFoundException(message)
+            }
     }
 
 }

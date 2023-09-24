@@ -1,5 +1,7 @@
 package ua.mevhen.controller
 
+import groovy.util.logging.Slf4j
+import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
@@ -10,8 +12,10 @@ import ua.mevhen.service.PostService
 
 import java.security.Principal
 
+@SecurityRequirement(name = "basicAuth")
 @RestController
 @RequestMapping('/api/posts')
+@Slf4j
 class PostController {
 
     private final PostService postService
@@ -26,7 +30,9 @@ class PostController {
         Principal principal,
         @RequestBody @Valid PostRequest postRequest
     ) {
-        return postService.save(principal.getName(), postRequest)
+        def username = principal.getName()
+        log.info("User '$username' is posting a new post")
+        return postService.save(username, postRequest)
     }
 
     @PutMapping('/{id}')
@@ -36,6 +42,7 @@ class PostController {
         @RequestBody @Valid PostRequest request
     ) {
         def username = principal.getName()
+        log.info("User '$username' is updating post with ID: $id")
         return postService.update(id, request, username)
     }
 
@@ -46,6 +53,7 @@ class PostController {
         @PathVariable('id') @NotBlank String id
     ) {
         def username = principal.getName()
+        log.info("User '$username' is deleting post with ID: $id")
         postService.delete(id, username)
     }
 

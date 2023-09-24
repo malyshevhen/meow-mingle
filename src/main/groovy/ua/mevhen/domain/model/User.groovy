@@ -15,7 +15,6 @@ import java.time.LocalDate
 
 @Document(collection = "user")
 @Builder
-@ToString
 class User {
 
     @MongoId
@@ -91,4 +90,14 @@ class User {
         return result
     }
 
+    @Override
+    String toString() {
+        return "User{id=$id, " +
+            "username='$username', " +
+            "email='$email', " +
+            "password='$password', " +
+            "role='$role', " +
+            "created=$created, " +
+            "updated=$updated}"
+    }
 }

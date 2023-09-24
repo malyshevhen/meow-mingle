@@ -1,5 +1,6 @@
 package ua.mevhen.controller
 
+import groovy.util.logging.Slf4j
 import jakarta.validation.ConstraintViolationException
 import org.springframework.http.HttpHeaders
 import org.springframework.http.HttpStatus
@@ -15,6 +16,7 @@ import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
 
 @RestControllerAdvice
+@Slf4j
 class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler([
@@ -26,6 +28,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         final RuntimeException ex,
         final WebRequest request
     ) {
+        log.error("Bad request error: ${ ex.message }")
         return handleExceptionInternal(ex, ex.getMessage(),
             new HttpHeaders(), HttpStatus.BAD_REQUEST, request)
     }
@@ -39,6 +42,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         final RuntimeException ex,
         final WebRequest request
     ) {
+        log.error("Not found error: ${ex.message}")
         return handleExceptionInternal(ex, ex.getMessage(),
             new HttpHeaders(), HttpStatus.NOT_FOUND, request)
     }
@@ -48,6 +52,7 @@ class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
         final RuntimeException ex,
         final WebRequest request
     ) {
+        log.error("Forbidden error: ${ex.message}")
         return handleExceptionInternal(ex, ex.getMessage(),
             new HttpHeaders(), HttpStatus.FORBIDDEN, request)
     }

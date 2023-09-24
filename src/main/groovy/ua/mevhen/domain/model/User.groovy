@@ -1,6 +1,5 @@
 package ua.mevhen.domain.model
 
-import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import jakarta.validation.constraints.NotNull
@@ -17,7 +16,6 @@ import java.time.LocalDate
 @Document(collection = "user")
 @Builder
 @ToString
-@EqualsAndHashCode
 class User {
 
     @MongoId
@@ -66,6 +64,31 @@ class User {
     @Transient
     private def removeSubscriber(User u) {
         this.subscribers.removeIf { it.id == u.id }
+    }
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (o == null || getClass() != o.class) return false
+
+        User user = (User) o
+
+        if (email != user.email) return false
+        if (id != user.id) return false
+        if (password != user.password) return false
+        if (role != user.role) return false
+        if (username != user.username) return false
+
+        return true
+    }
+
+    int hashCode() {
+        int result
+        result = (id != null ? id.hashCode() : 0)
+        result = 31 * result + (username != null ? username.hashCode() : 0)
+        result = 31 * result + (email != null ? email.hashCode() : 0)
+        result = 31 * result + (password != null ? password.hashCode() : 0)
+        result = 31 * result + (role != null ? role.hashCode() : 0)
+        return result
     }
 
 }

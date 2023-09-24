@@ -14,7 +14,7 @@ interface UserService {
 
     void deleteById(String id)
 
-    Collection<UserInfo> subscribe(String username, String subId)
+    void subscribe(String username, String subId)
 
-    Collection<UserInfo> unsubscribe(String username, String subId)
+    void unsubscribe(String username, String subId)
 }

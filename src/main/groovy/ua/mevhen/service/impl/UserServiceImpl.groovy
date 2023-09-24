@@ -1,5 +1,6 @@
 package ua.mevhen.service.impl
 
+import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
@@ -14,6 +15,7 @@ import ua.mevhen.repository.UserRepository
 import ua.mevhen.service.UserService
 
 @Service
+@Slf4j
 class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository
@@ -32,18 +34,25 @@ class UserServiceImpl implements UserService {
     UserInfo save(UserRegistration regForm) {
         def username = regForm.username
         if (ifExists(username)) {
-            throw new UserAlreadyExistsException("Username: '$username' is taken.")
+            final message = "Username: '$username' is taken."
+            log.error(message)
+            throw new UserAlreadyExistsException(message)
         }
         def userToSave = userMapper.toUser(regForm)
         userToSave.role = Role.USER.value
         def savedUser = userRepository.save(userToSave)
+        log.info("Saved user with ID: ${ savedUser.id }")
         return userMapper.toUserInfo(savedUser)
     }
 
     @Override
     User findByUsername(String username) {
         return userRepository.findByUsername(username)
-            .orElseThrow { -> new UserNotFoundException("User: '$username' was not found.") }
+            .orElseThrow { ->
+                final message = "User: '$username' was not found."
+                log.error(message)
+                new UserNotFoundException(message)
+            }
     }
 
     @Override
@@ -52,6 +61,7 @@ class UserServiceImpl implements UserService {
         def user = findById(id)
         user.username = username
         def updatedUser = userRepository.save(user)
+        log.info("Updated username for user with ID: ${ updatedUser.id } to: $username")
         return userMapper.toUserInfo(updatedUser)
     }
 
@@ -60,21 +70,26 @@ class UserServiceImpl implements UserService {
     void deleteById(String id) {
         def user = findById(id)
         userRepository.delete(user)
+        log.info("Deleted user with ID: $id")
     }
 
     @Override
     @Transactional
-    List<UserInfo> subscribe(String username, String subId) {
-        return updateSubscriptions(username, subId) { user, sub -> user.subscribe(sub) }
+    void subscribe(String username, String subId) {
+        log.info("Process subscription of User: $username to user with ID: $subId")
+        updateSubscriptions(username, subId) { user, sub -> user.subscribe(sub) }
+        log.info("Subscription of User: $username to user with ID: $subId completed.")
     }
 
     @Override
     @Transactional
-    List<UserInfo> unsubscribe(String username, String subId) {
-        return updateSubscriptions(username, subId) { user, sub -> user.unsubscribe(sub) }
+    void unsubscribe(String username, String subId) {
+        log.info("Process unsubscription of User: $username from user with ID: $subId")
+        updateSubscriptions(username, subId) { user, sub -> user.unsubscribe(sub) }
+        log.info("Unsubscription of User: $username from user with ID: $subId completed.")
     }
 
-    private List<UserInfo> updateSubscriptions(
+    private void updateSubscriptions(
         String username,
         String subId,
         Closure<User> subscriptionAction
@@ -84,14 +99,16 @@ class UserServiceImpl implements UserService {
 
         subscriptionAction(user, sub)
 
-        def updatedUsers = [user, sub].collect {userRepository.save(it)}
-
-        return updatedUsers.collect { userMapper.toUserInfo(it) }
+        [user, sub].each { userRepository.save(it) }
     }
 
     private User findById(String id) {
         userRepository.findById(new ObjectId(id))
-            .orElseThrow { -> new UserNotFoundException("User with id: $id was not found.") }
+            .orElseThrow { ->
+                final message = "User with ID: $id was not found."
+                log.error(message)
+                new UserNotFoundException(message)
+            }
     }
 
     private boolean ifExists(String username) {

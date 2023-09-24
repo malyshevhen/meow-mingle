@@ -4,3 +4,22 @@ spring:
   data:
     mongodb:
       uri: 'mongodb://localhost:27017/meow-mingle'
+    redis:
+      host: '127.0.0.1'
+      port: 6379
+
+subscription:
+  worker:
+    timeout: 500
+    key-name: 'subscription-events'
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    ua.mevhen: INFO
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: 'log/tests/meow-mingle-test.log'

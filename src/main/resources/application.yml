@@ -3,12 +3,31 @@ server:
 
 spring:
   application:
-    name: 'meow-mingle'
+    name: ${SPRING_APPLICATION_NAME:meow-mingle}
   data:
     mongodb:
-      database: 'meow-mingle'
-      host: 127.0.0.1
-      port: 27017
-      authentication-database: admin
-      username: user
-      password: password
+      database: ${MONGODB_DATABASE:meow-mingle-db}
+      host: ${MONGODB_HOST:127.0.0.1}
+      port: ${MONGODB_PORT:27017}
+      authentication-database: ${MONGODB_AUTH_DB:admin}
+      username: ${MONGODB_USERNAME:user}
+      password: ${MONGODB_PASSWORD:password}
+    redis:
+      host: ${REDIS_HOST:127.0.0.1}
+      port: ${REDIS_PORT:6379}
+
+subscription:
+  worker:
+    timeout: 500
+    key-name: 'subscription-events'
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    ua.mevhen: DEBUG
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: '/logs/meow-mingle.log'

@@ -20,15 +20,15 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class RegistrationControllerSpec extends Specification {
 
     @Autowired
-    private MockMvc mockMvc
+    MockMvc mockMvc
 
     @Autowired
-    private ObjectMapper mapper
+    ObjectMapper mapper
 
     @SpringBean
-    private UserService userService = Mock(UserService)
+    UserService userService = Mock(UserService)
 
-    def "test register with valid registration data"() {
+    def "test register with valid registration data, expected status 201"() {
         given: 'Valid user registration DTO'
         def validRegistration = new UserRegistration(
             username: "testUser",
@@ -36,9 +36,9 @@ class RegistrationControllerSpec extends Specification {
             password: "Password123"
         )
 
-        userService.save(validRegistration) >> new UserInfo(id: "1", username: "testUser")
 
         when: 'Perform registration'
+        userService.save(validRegistration) >> new UserInfo(id: "1", username: "testUser")
         def result = mockMvc.perform(post('/api/user/register')
             .contentType('application/json')
             .content(mapper.writeValueAsString(validRegistration)))

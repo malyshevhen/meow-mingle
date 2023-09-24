@@ -1,10 +1,8 @@
 package ua.mevhen.domain.model
 
-import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
 import groovy.transform.builder.Builder
 import org.bson.types.ObjectId
-import org.springframework.data.annotation.CreatedBy
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
 import org.springframework.data.mongodb.core.mapping.Document
@@ -16,7 +14,6 @@ import java.time.LocalDate
 @Document(collection = 'post')
 @Builder
 @ToString
-@EqualsAndHashCode
 class Post {
 
     @MongoId
@@ -27,10 +24,10 @@ class Post {
 
     private String content
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private Set<User> likes = new HashSet()
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private Set<Comment> comments = new HashSet<>()
 
     @CreatedDate
@@ -38,4 +35,26 @@ class Post {
 
     @LastModifiedDate
     private LocalDate updated
+
+    boolean equals(o) {
+        if (this.is(o)) return true
+        if (o == null || getClass() != o.class) return false
+
+        Post post = (Post) o
+
+        if (author != post.author) return false
+        if (created != post.created) return false
+        if (id != post.id) return false
+
+        return true
+    }
+
+    int hashCode() {
+        int result
+        result = (id != null ? id.hashCode() : 0)
+        result = 31 * result + (author != null ? author.hashCode() : 0)
+        result = 31 * result + (created != null ? created.hashCode() : 0)
+        return result
+    }
+
 }

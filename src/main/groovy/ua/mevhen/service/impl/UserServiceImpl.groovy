@@ -5,6 +5,7 @@ import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.domain.model.Role
 import ua.mevhen.domain.model.User
 import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
@@ -34,8 +35,15 @@ class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException("Username: '$username' is taken.")
         }
         def userToSave = userMapper.toUser(regForm)
+        userToSave.role = Role.USER.value
         def savedUser = userRepository.save(userToSave)
         return userMapper.toUserInfo(savedUser)
+    }
+
+    @Override
+    User findByUsername(String username) {
+        return userRepository.findByUsername(username)
+            .orElseThrow { -> new UserNotFoundException("User: '$username' was not found.") }
     }
 
     @Override
@@ -76,14 +84,9 @@ class UserServiceImpl implements UserService {
 
         subscriptionAction(user, sub)
 
-        def updatedUsers = userRepository.saveAll { [user, sub] }
+        def updatedUsers = [user, sub].collect {userRepository.save(it)}
 
         return updatedUsers.collect { userMapper.toUserInfo(it) }
-    }
-
-    private User findByUsername(String username) {
-        return userRepository.findByUsername(username)
-            .orElseThrow { -> new UserNotFoundException("User: '$username' was not found.") }
     }
 
     private User findById(String id) {

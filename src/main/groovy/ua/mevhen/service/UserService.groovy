@@ -2,8 +2,11 @@ package ua.mevhen.service
 
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.domain.model.User
 
 interface UserService {
+
+    User findByUsername(String username)
 
     UserInfo save(UserRegistration rerForm)
 

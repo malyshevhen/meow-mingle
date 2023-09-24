@@ -12,12 +12,14 @@ class UserMapper {
         return new User(
             username: registration.username,
             email: registration.email,
-            password: registration.password)
+            password: registration.password
+        )
     }
 
     UserInfo toUserInfo(User user) {
         return new UserInfo(
             id: user.id.toString(),
-            username: user.username)
+            username: user.username
+        )
     }
 }

@@ -26,12 +26,14 @@ class RedisReactionWorker implements Runnable {
 
     @Override
     void run() {
-        def reaction = reactionRedisTemplate.opsForList()
-            .rightPop(properties.keyName, Duration.ofMillis(properties.timeout))
+        while (true) {
+            def reaction = reactionRedisTemplate.opsForList()
+                .rightPop(properties.keyName, Duration.ofMillis(properties.timeout))
 
-        if (reaction != null) {
-            log.info("Received reaction event: '$reaction'")
-            reactionService.manageReaction(reaction)
+            if (reaction != null) {
+                log.info("Received reaction event: '$reaction'")
+                reactionService.manageReaction(reaction)
+            }
         }
     }
 

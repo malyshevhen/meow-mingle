@@ -25,11 +25,11 @@ class SubscriptionServiceRunner implements CommandLineRunner {
         log.info("Initializing SubscriptionServiceRunner...")
 
         try {
-            redisSubscriptionTaskExecutor.execute(redisSubscriptionWorker);
-            log.info("Redis subscription worker has been executed successfully.");
+            redisSubscriptionTaskExecutor.execute(redisSubscriptionWorker)
+            log.info("Redis subscription worker has been executed successfully.")
         } catch (Exception e) {
-            log.error("Error executing Redis subscription worker: ${e.message}");
+            log.error("Error executing Redis subscription worker: ${e.message}")
         }
-        log.info("SubscriptionServiceRunner has completed.");
+        log.info("SubscriptionServiceRunner has completed.")
     }
 }

@@ -26,11 +26,11 @@ class ReactionServiceRunner implements CommandLineRunner {
 
         try {
             redisReactionTaskExecutor.execute(reactionWorker)
-            log.info("Redis reaction worker has been executed successfully.");
+            log.info("Redis reaction worker has been executed successfully.")
         } catch (Exception e) {
-            log.error("Error executing Redis reaction worker: ${ e.message }");
+            log.error("Error executing Redis reaction worker: ${ e.message }")
 
         }
-        log.info("ReactionServiceRunner has completed.");
+        log.info("ReactionServiceRunner has completed.")
     }
 }

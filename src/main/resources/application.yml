@@ -41,7 +41,7 @@ comment-task:
     max-pool-size: 4
   worker:
     timeout: 500
-    key-name: 'reaction-events'
+    key-name: 'comment-events'
 
 logging:
   level:

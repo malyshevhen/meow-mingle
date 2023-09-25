@@ -24,6 +24,9 @@ class Comment {
     @DocumentReference(lazy = true)
     private User author
 
+    @DocumentReference
+    private Post post
+
     private String content
 
     @CreatedDate

@@ -36,25 +36,24 @@ class CommentController {
         commentService.save(username,postId, request)
     }
 
-    @PutMapping('/{postId}')
+    @PutMapping('/{commentId}')
     void update(
         Principal principal,
-        @PathVariable('postId') String postId,
+        @PathVariable('commentId') String commentId,
         @RequestBody @Valid CommentRequest request
     ) {
         def username = principal.name
-        commentService.update(username, postId, request)
+        commentService.update(username, commentId, request)
     }
 
-    @DeleteMapping('/{postId}/{commentId}')
+    @DeleteMapping('/{commentId}')
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void delete(
         Principal principal,
-        @PathVariable('postId') String postId,
         @PathVariable('commentId') String commentId
     ) {
         def username = principal.name
-        commentService.delete(username, postId, commentId)
+        commentService.delete(username, commentId)
     }
 
 }

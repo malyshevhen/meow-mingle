@@ -69,11 +69,16 @@ class PostServiceImpl implements PostService {
     }
 
     @Override
-    void updateComments(Post post) {
-        def existingPost = findById(post.id)
-        existingPost.comments = post.comments
-
-        postRepository.save(post)
+    @Transactional
+    PostResponse update(Post post) {
+        if (post.id == null) {
+            def message = "Missing unique identifier."
+            log.error(message)
+            throw new IllegalArgumentException(message)
+        }
+        def updatedPost = postRepository.save(post)
+        log.info("Post ID: ${ post.id } updated successfully.")
+        return postMapper.toResponse(updatedPost)
     }
 
     @Override

@@ -1,13 +1,14 @@
 package ua.mevhen.service
 
 import ua.mevhen.domain.dto.CommentRequest
+import ua.mevhen.domain.dto.CommentResponse
 
 interface CommentService {
 
-    void save(String username, String postId, CommentRequest request)
+    CommentResponse save(String username, String postId, CommentRequest request)
 
-    void update(String username, String postId, CommentRequest request)
+    CommentResponse update(String username, String commentId, CommentRequest request)
 
-    void delete(String username, String postId, String commentId)
+    void delete(String username, String commentId)
 
 }

@@ -12,7 +12,7 @@ interface PostService {
 
     PostResponse update(String id, PostRequest request, String userId)
 
-    void updateComments(Post post)
+    PostResponse update(Post post)
 
     void delete(String id, String username)
 

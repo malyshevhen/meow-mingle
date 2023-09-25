@@ -5,8 +5,10 @@ import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ua.mevhen.domain.dto.CommentRequest
-import ua.mevhen.domain.model.Post
+import ua.mevhen.domain.dto.CommentResponse
+import ua.mevhen.domain.model.Comment
 import ua.mevhen.exceptions.CommentNotFoundException
+import ua.mevhen.exceptions.PermissionDeniedException
 import ua.mevhen.mapper.CommentMapper
 import ua.mevhen.repository.CommentRepository
 
@@ -33,44 +35,55 @@ class CommentServiceImpl implements CommentService {
 
     @Override
     @Transactional
-    void save(String username, String postId, CommentRequest request) {
-        changeComment(username, postId, request, { post, comment -> post.addComment(comment) })
-    }
-
-    @Override
-    @Transactional
-    void update(String username, String postId, CommentRequest request) {
-        changeComment(username, postId, request, { post, comment -> post.updateComment(comment) })
-    }
-
-    @Override
-    @Transactional
-    void delete(String username, String postId, String commentId) {
-        def existingComment = commentRepository.findById(new ObjectId(commentId))
-            .orElseThrow { ->
-                new CommentNotFoundException("Comment with ID: $commentId not found.")
-            }
-
-        def request = commentMapper.toRequest(existingComment)
-        changeComment(username, postId, request, { post, comment -> post.removeComment(comment) })
-    }
-
-    private void changeComment(
-        String username,
-        String postId,
-        CommentRequest request,
-        Closure<Post> postClosure
-    ) {
+    CommentResponse save(String username, String postId, CommentRequest request) {
         def post = postService.findById(postId)
         def user = userService.findByUsername(username)
         def comment = commentMapper.toComment(request)
         comment.author = user
+        comment.post = post
+        post.addComment(comment)
 
         def savedComment = commentRepository.save(comment)
 
-        postClosure(post, savedComment)
+        postService.update(post)
 
-        postService.updateComments(post)
+        return commentMapper.toResponse(savedComment)
+    }
+
+    @Override
+    @Transactional
+    CommentResponse update(String username, String commentId, CommentRequest request) {
+        def commentToUpdate = findById(commentId)
+        if (commentToUpdate.author.username != username) {
+            def message = "Comment ID: ${ commentToUpdate.id } not canged. Permission denied"
+            log.error(message)
+            throw new PermissionDeniedException(message)
+        }
+        commentToUpdate.content = request.content
+        def updatedComment = commentRepository.save(commentToUpdate)
+
+        return commentMapper.toResponse(updatedComment)
+    }
+
+    @Override
+    @Transactional
+    void delete(String username, String commentId) {
+        def commentToDelete = findById(commentId)
+        if (commentToDelete.author.username != username) {
+            def message = "Comment ID: ${ commentToDelete.id } not canged. Permission denied"
+            log.error(message)
+            throw new PermissionDeniedException(message)
+        }
+        commentRepository.delete(commentToDelete)
+    }
+
+    private Comment findById(String commentId) {
+        commentRepository.findById(new ObjectId(commentId))
+            .orElseThrow { ->
+                def message = "Comment with ID: $commentId not found."
+                log.error(message)
+                new CommentNotFoundException(message)
+            }
     }
 
 }

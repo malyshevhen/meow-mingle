@@ -16,7 +16,7 @@ class SecurityConfig {
 
     @Bean
     PasswordEncoder passwordEncoder() {
-        return new NoOpPasswordEncoder()
+        return new NoOpPasswordEncoder() // TODO: change in prod!!!
     }
 
     @Bean
@@ -28,9 +28,8 @@ class SecurityConfig {
                     "/swagger-ui/**",
                     "/swagger-ui.html").permitAll()
                 it.requestMatchers('/api/user/register').permitAll()
-                it.requestMatchers('/api/user/**').hasRole('USER')
-                it.requestMatchers('/api/posts/**').hasRole('USER')
-//                it.anyRequest().authenticated()
+                it.requestMatchers('/api/user/**', '/api/posts/**', '/api/reaction/**').hasRole('USER')
+                it.anyRequest().authenticated()
             }
             .httpBasic(Customizer.withDefaults())
             .build()

@@ -31,6 +31,16 @@ class PostServiceImpl implements PostService {
     }
 
     @Override
+    Post findById(String id) {
+        postRepository.findById(new ObjectId(id))
+            .orElseThrow { ->
+                final message = "Post with ID: $id not found."
+                log.error(message)
+                new PostNotFoundException(message)
+            }
+    }
+
+    @Override
     @Transactional
     PostResponse save(String username, PostRequest request) {
         def user = userService.findByUsername(username)
@@ -56,6 +66,14 @@ class PostServiceImpl implements PostService {
             log.error(message)
             throw new PermissionDeniedException(message)
         }
+    }
+
+    @Override
+    void updateComments(Post post) {
+        def existingPost = findById(post.id)
+        existingPost.comments = post.comments
+
+        postRepository.save(post)
     }
 
     @Override
@@ -105,15 +123,6 @@ class PostServiceImpl implements PostService {
         reactionAction(post, user)
 
         postRepository.save(post)
-    }
-
-    private Post findById(String id) {
-        postRepository.findById(new ObjectId(id))
-            .orElseThrow { ->
-                final message = "Post with ID: $id not found."
-                log.error(message)
-                new PostNotFoundException(message)
-            }
     }
 
 }

@@ -17,4 +17,7 @@ interface UserService {
     void subscribe(String username, String subId)
 
     void unsubscribe(String username, String subId)
+
+    boolean ifExists(String username)
+
 }

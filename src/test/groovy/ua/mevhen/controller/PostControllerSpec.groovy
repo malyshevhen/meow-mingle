@@ -9,7 +9,6 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.ResultMatcher
 import spock.lang.Specification
 import ua.mevhen.domain.dto.PostRequest
 import ua.mevhen.domain.dto.PostResponse
@@ -19,18 +18,16 @@ import ua.mevhen.service.PostService
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc
 class PostControllerSpec extends Specification {
 
-    public static final def POST_NOT_FOUND_EXCEPTION
+    private static final POST_NOT_FOUND_EXCEPTION
         = new PostNotFoundException('PostNotFoundException')
-    public static final def PERMISSION_DENIED_EXCEPTION
+    private static final PERMISSION_DENIED_EXCEPTION
         = new PermissionDeniedException('PermissionDeniedException')
-    public static final def CONSTRAINT_VIOLATION_EXCEPTION
+    private static final CONSTRAINT_VIOLATION_EXCEPTION
         = new ConstraintViolationException('ConstraintViolationException', Set.of())
 
     @Autowired
@@ -52,51 +49,35 @@ class PostControllerSpec extends Specification {
 
         when:
         postService.save('John', postRequest) >> postResponse
-        def result = mockMvc.perform(
-            post("/api/posts")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(postRequest))
-        )
+        def result = performPost(postRequest)
+        def responseContent = result.response.getContentAsString()
+        def actualResponse = objectMapper.readValue(responseContent, PostResponse)
 
         then:
-        result.andExpect(status().isCreated())
-            .andExpect(jsonPath(/$.id/).value(postId))
-            .andExpect(jsonPath(/$.content/).value("Test Content"))
+        result.response.status == 201
+        actualResponse.id == postId
+        actualResponse.content == 'Test Content'
     }
 
     @WithMockUser(username = 'John')
-    def "When post is posted, and #exception.message is thrown expect status is: #httpStatus"(
+    def "When trying to save new post, and #exception.message is thrown, expected status is: #httpStatus"(
         Exception exception,
-        ResultMatcher resultMatcher,
-        String httpStatus
+        int httpStatus
     ) {
         given:
         def postRequest = new PostRequest(content: '')
 
         when:
         postService.save('John', postRequest) >> { throw exception }
-        def result = mockMvc.perform(
-            post("/api/posts")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(postRequest))
-        )
+        def result = performPost(postRequest)
 
         then:
-        switch (exception) {
-            case ConstraintViolationException:
-                result.andExpect(resultMatcher)
-                break
-            case PostNotFoundException:
-                result.andExpect(resultMatcher)
-                break
-            default:
-                throw new AssertionError("Unexpected exception type: ${ exception.getClass().name }")
-        }
+        result.response.status == httpStatus
 
         where:
-        exception                      | resultMatcher           | httpStatus
-        CONSTRAINT_VIOLATION_EXCEPTION | status().isBadRequest() | 'Bad request'
-        POST_NOT_FOUND_EXCEPTION       | status().isNotFound()   | 'Not Found'
+        exception                      | httpStatus
+        CONSTRAINT_VIOLATION_EXCEPTION | 400
+        POST_NOT_FOUND_EXCEPTION       | 404
     }
 
     @WithMockUser(username = 'John')
@@ -109,23 +90,20 @@ class PostControllerSpec extends Specification {
 
         when:
         postService.update(postId, postRequest, 'John') >> postResponse
-        def result = mockMvc.perform(
-            put("/api/posts/$postId")
-                .contentType('application/json')
-                .content(objectMapper.writeValueAsString(postRequest))
-        )
+        def result = performPut(postId, postRequest)
+        def responseContent = result.response.getContentAsString()
+        def actualResponse = objectMapper.readValue(responseContent, PostResponse)
 
         then:
-        result.andExpect(status().isOk())
-            .andExpect(jsonPath(/$.id/).value(postId))
-            .andExpect(jsonPath(/$.content/).value('Updated Content'))
+        result.response.status == 200
+        actualResponse.id == postId
+        actualResponse.content == 'Updated Content'
     }
 
     @WithMockUser(username = 'John')
-    def "When tri to update post, and #exception.message is thrown, expected status is: #httpStatus"(
+    def "When trying to update post, and #exception.message is thrown, expected status is: #httpStatus"(
         Exception exception,
-        ResultMatcher resultMatcher,
-        String httpStatus
+        int httpStatus
     ) {
         given:
         def postId = new ObjectId().toString()
@@ -133,32 +111,16 @@ class PostControllerSpec extends Specification {
 
         when:
         postService.update(postId, postRequest, 'John') >> { throw exception }
-        def result = mockMvc.perform(
-            put("/api/posts/$postId")
-                .contentType('application/json')
-                .content(objectMapper.writeValueAsString(postRequest))
-        )
+        def result = performPut(postId, postRequest)
 
         then:
-        switch (exception) {
-            case ConstraintViolationException:
-                result.andExpect(resultMatcher)
-                break
-            case PermissionDeniedException:
-                result.andExpect(resultMatcher)
-                break
-            case PostNotFoundException:
-                result.andExpect(resultMatcher)
-                break
-            default:
-                throw new AssertionError("Unexpected exception type: ${ exception.getClass().name }")
-        }
+        result.response.status == httpStatus
 
         where:
-        exception                      | resultMatcher           | httpStatus
-        CONSTRAINT_VIOLATION_EXCEPTION | status().isBadRequest() | 'Bad request'
-        PERMISSION_DENIED_EXCEPTION    | status().isForbidden()  | 'Forbidden'
-        POST_NOT_FOUND_EXCEPTION       | status().isNotFound()   | 'Not Found'
+        exception                      | httpStatus
+        CONSTRAINT_VIOLATION_EXCEPTION | 400
+        PERMISSION_DENIED_EXCEPTION    | 403
+        POST_NOT_FOUND_EXCEPTION       | 404
     }
 
     @WithMockUser(username = 'John')
@@ -168,47 +130,55 @@ class PostControllerSpec extends Specification {
 
         when:
         postService.delete(postId, 'John')
-        def result = mockMvc.perform(
-            delete("/api/posts/$postId"))
+        def result = performDelete(postId)
 
         then:
-        result.andExpect(status().isNoContent())
+        result.response.status == 204
     }
 
     @WithMockUser(username = 'John')
-    def "When tri to delete post, and #exception.message is thrown, expected status is: #httpStatus"(
+    def "When trying to delete post, and #exception.message is thrown, expected status is: #httpStatus"(
         Exception exception,
-        ResultMatcher resultMatcher,
-        String httpStatus
+        int httpStatus
     ) {
         given:
         def postId = new ObjectId().toString()
 
         when:
         postService.delete(postId, 'John') >> { throw exception }
-        def result = mockMvc.perform(
-            delete("/api/posts/$postId"))
+        def result = performDelete(postId)
+
 
         then:
-        switch (exception) {
-            case ConstraintViolationException:
-                result.andExpect(resultMatcher)
-                break
-            case PermissionDeniedException:
-                result.andExpect(resultMatcher)
-                break
-            case PostNotFoundException:
-                result.andExpect(resultMatcher)
-                break
-            default:
-                throw new AssertionError("Unexpected exception type: ${ exception.getClass().name }")
-        }
+        result.response.status == httpStatus
 
         where:
-        exception                      | resultMatcher           | httpStatus
-        CONSTRAINT_VIOLATION_EXCEPTION | status().isBadRequest() | 'Bad request'
-        PERMISSION_DENIED_EXCEPTION    | status().isForbidden()  | 'Forbidden'
-        POST_NOT_FOUND_EXCEPTION       | status().isNotFound()   | 'Not Found'
+        exception                      | httpStatus
+        CONSTRAINT_VIOLATION_EXCEPTION | 400
+        PERMISSION_DENIED_EXCEPTION    | 403
+        POST_NOT_FOUND_EXCEPTION       | 404
+    }
+
+    private def performPost(PostRequest postRequest) {
+        mockMvc.perform(
+            post("/api/posts")
+                .contentType("application/json")
+                .content(objectMapper.writeValueAsString(postRequest)))
+            .andReturn()
+    }
+
+    private def performPut(String postId, PostRequest postRequest) {
+        mockMvc.perform(
+            put("/api/posts/$postId")
+                .contentType('application/json')
+                .content(objectMapper.writeValueAsString(postRequest)))
+            .andReturn()
+    }
+
+    private def performDelete(String postId) {
+        mockMvc.perform(
+            delete("/api/posts/$postId"))
+            .andReturn()
     }
 
 }

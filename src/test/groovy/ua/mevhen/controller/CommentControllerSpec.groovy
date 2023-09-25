@@ -55,12 +55,6 @@ class CommentControllerSpec extends Specification {
         def commentId = new ObjectId().toString()
         def commentRequest = new CommentRequest(content: "Updated comment")
 
-        def response = new CommentResponse(
-            id: commentId,
-            authorId: new ObjectId().toString(),
-            content: 'Updated comment',
-            created: LocalDate.now()
-        )
         when:
         def result = performPut(commentId, commentRequest)
 

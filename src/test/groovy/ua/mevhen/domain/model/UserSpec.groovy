@@ -40,8 +40,8 @@ class UserSpec extends Specification {
         user1.subscribe(user2)
 
         then:
-        user1.subscriptions == [user2] as HashSet
-        user2.subscribers == [user1] as HashSet
+        user1.subscriptions == [user2].toSet()
+        user2.subscribers == [user1].toSet()
 
         when:
         user1.unsubscribe(user2)
@@ -70,7 +70,7 @@ class UserSpec extends Specification {
         user1.addSubscriber(user2)
 
         then:
-        user1.subscribers == [user2] as HashSet
+        user1.subscribers == [user2].toSet()
 
         when:
         user1.removeSubscriber(user2)

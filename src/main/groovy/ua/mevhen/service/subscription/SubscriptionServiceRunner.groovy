@@ -22,7 +22,7 @@ class SubscriptionServiceRunner implements CommandLineRunner {
 
     @Override
     void run(String... args) throws Exception {
-        log.info("Starting SubscriptionServiceRunner...")
+        log.info("Initializing SubscriptionServiceRunner...")
 
         try {
             redisSubscriptionTaskExecutor.execute(redisSubscriptionWorker);
@@ -30,7 +30,6 @@ class SubscriptionServiceRunner implements CommandLineRunner {
         } catch (Exception e) {
             log.error("Error executing Redis subscription worker: ${e.message}");
         }
-
         log.info("SubscriptionServiceRunner has completed.");
     }
 }

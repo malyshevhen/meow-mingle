@@ -36,7 +36,7 @@ reaction-task:
 
 comment-task:
   thread-pool:
-    thread-name-prefix: 'reaction-worker-'
+    thread-name-prefix: 'comment-worker-'
     core-pool-size: 2
     max-pool-size: 4
   worker:

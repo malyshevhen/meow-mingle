@@ -1,4 +1,4 @@
-package ua.mevhen.service.impl
+package ua.mevhen.service
 
 import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
@@ -11,8 +11,6 @@ import ua.mevhen.exceptions.PermissionDeniedException
 import ua.mevhen.exceptions.PostNotFoundException
 import ua.mevhen.mapper.PostMapper
 import ua.mevhen.repository.PostRepository
-import ua.mevhen.service.PostService
-import ua.mevhen.service.UserService
 
 @Service
 @Slf4j
@@ -73,6 +71,40 @@ class PostServiceImpl implements PostService {
             log.error(message)
             throw new PermissionDeniedException(message)
         }
+    }
+
+    @Override
+    @Transactional
+    void addLike(String username, String postId) {
+        log.info("Process adding like of User: $username to post with ID: $postId ...")
+        updateReaction(username, postId, { post, user -> post.addLike(user) })
+        log.info("Adding like of User: $username to post with ID: $postId completed")
+    }
+
+    @Override
+    @Transactional
+    void removeLike(String username, String postId) {
+        log.info("Process removing like of User: $username from post with ID: $postId ...")
+        updateReaction(username, postId, { post, user -> post.removeLike(user) })
+        log.info("REmoving like of User: $username from post with ID: $postId completed")
+    }
+
+    private updateReaction(
+        String username,
+        String postId,
+        Closure<Post> reactionAction
+    ) {
+        def user = userService.findByUsername(username)
+        def post = postRepository.findById(new ObjectId(postId))
+            .orElseThrow { ->
+                def message = "Post with ID: '$postId' not found"
+                log.error(message)
+                new PostNotFoundException(message)
+            }
+
+        reactionAction(post, user)
+
+        postRepository.save(post)
     }
 
     private Post findById(String id) {

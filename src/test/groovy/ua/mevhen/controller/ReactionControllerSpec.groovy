@@ -9,48 +9,53 @@ import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Retry
 import ua.mevhen.domain.model.User
 import ua.mevhen.service.AbstractIntegrationSpec
+import ua.mevhen.service.PostService
 import ua.mevhen.service.UserService
 
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @AutoConfigureMockMvc
-class SubscriptionControllerSpec extends AbstractIntegrationSpec {
+class ReactionControllerSpec extends AbstractIntegrationSpec {
 
     private static USERNAME = 'John'
-    public static final SUB_ID = new ObjectId().toString()
+    private static POST_ID = new ObjectId().toString()
 
     @Autowired
     MockMvc mockMvc
+
+    @SpringBean
+    PostService postService = Mock(PostService)
 
     @SpringBean
     UserService userService = Mock(UserService)
 
     @Retry(count = 2)
     @WithMockUser(username = 'John')
-    def "test subscribe to another user"() {
+    def "should add a like reaction"() {
         when:
-        def result = mockMvc.perform(post("/api/user/subscribe/${ SUB_ID }"))
+        def result = mockMvc.perform(post("/api/reaction/like/{postId}", POST_ID))
         userService.findByUsername(USERNAME) >> new User()
         Thread.sleep(100)
 
         then:
-        1 * userService.subscribe(USERNAME, SUB_ID)
-        0 * userService.unsubscribe(_, _)
+        1 * postService.addLike(USERNAME, POST_ID)
+        0 * postService.removeLike(_, _)
         result.andExpect(status().isOk())
     }
 
     @Retry(count = 2)
-    @WithMockUser(username = 'John')
-    def "test unsubscribe from another user"() {
+    @WithMockUser(username = "John")
+    def "should remove a like reaction"() {
         when:
-        def result = mockMvc.perform(post("/api/user/unsubscribe/${ SUB_ID }"))
+        def result = mockMvc.perform(post("/api/reaction/unlike/{postId}", POST_ID))
         userService.findByUsername(USERNAME) >> new User()
         Thread.sleep(100)
 
         then:
-        1 * userService.unsubscribe(USERNAME, SUB_ID)
-        0 * userService.subscribe(_, _)
+        1 * postService.removeLike(USERNAME, POST_ID)
+        0 * postService.addLike(_, _)
         result.andExpect(status().isOk())
     }
+
 }

@@ -1,6 +1,6 @@
 package ua.mevhen.service.subscription
 
-import ua.mevhen.domain.dto.Subscription
+import ua.mevhen.domain.events.Subscription
 
 interface SubscriptionService {
 

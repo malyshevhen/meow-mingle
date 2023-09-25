@@ -1,4 +1,4 @@
-package ua.mevhen.domain.dto
+package ua.mevhen.domain.events
 
 enum SubscriptionOperation {
     SUBSCRIBE,

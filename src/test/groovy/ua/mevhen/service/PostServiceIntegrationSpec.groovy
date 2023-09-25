@@ -5,6 +5,7 @@ import org.springframework.beans.factory.annotation.Autowired
 import ua.mevhen.domain.dto.PostRequest
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.domain.model.Post
 import ua.mevhen.exceptions.PermissionDeniedException
 import ua.mevhen.exceptions.PostNotFoundException
 
@@ -117,6 +118,38 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         thrown(PermissionDeniedException)
+    }
+
+    def "test like and unlike operations"() {
+        given:
+
+        def publication = new PostRequest(content: 'test post')
+
+        when:
+        def userInfo = userInfos[0]
+        def postResponse = postService.save(userInfo.username, publication)
+
+        then:
+        userInfo.id != null
+        postResponse.id != null
+
+
+        when:
+        def postId = postResponse.id
+        postService.addLike(userInfo.username, postId)
+        def user = userService.findById(userInfo.id)
+        Post post = postService.findById(postId)
+
+        then:
+        post.likes.contains(user)
+
+        when:
+        postService.removeLike(userInfo.username, postId)
+        user = userService.findById(userInfo.id)
+        post = postService.findById(postId)
+
+        then:
+        !post.likes.contains(user)
     }
 
 }

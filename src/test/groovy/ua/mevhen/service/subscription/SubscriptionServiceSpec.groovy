@@ -2,12 +2,12 @@ package ua.mevhen.service.subscription
 
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
-import ua.mevhen.domain.dto.Subscription
+import ua.mevhen.domain.events.Subscription
 import ua.mevhen.service.AbstractIntegrationSpec
 import ua.mevhen.service.UserService
 
-import static ua.mevhen.domain.dto.SubscriptionOperation.SUBSCRIBE
-import static ua.mevhen.domain.dto.SubscriptionOperation.UNSUBSCRIBE
+import static ua.mevhen.domain.events.SubscriptionOperation.SUBSCRIBE
+import static ua.mevhen.domain.events.SubscriptionOperation.UNSUBSCRIBE
 
 class SubscriptionServiceSpec extends AbstractIntegrationSpec {
 

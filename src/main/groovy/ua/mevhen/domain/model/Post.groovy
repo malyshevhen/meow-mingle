@@ -1,7 +1,7 @@
 package ua.mevhen.domain.model
 
+import groovy.transform.EqualsAndHashCode
 import groovy.transform.ToString
-import groovy.transform.builder.Builder
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
@@ -12,8 +12,19 @@ import org.springframework.data.mongodb.core.mapping.MongoId
 import java.time.LocalDate
 
 @Document(collection = 'post')
-@Builder
-@ToString
+@ToString(
+    includeFields = true,
+    excludes = [
+        'likes',
+        'comments'
+    ])
+@EqualsAndHashCode(
+    includeFields = true,
+    excludes = [
+        'likes',
+        'comments',
+        'updated'
+    ])
 class Post {
 
     @MongoId
@@ -36,25 +47,12 @@ class Post {
     @LastModifiedDate
     private LocalDate updated
 
-    boolean equals(o) {
-        if (this.is(o)) return true
-        if (o == null || getClass() != o.class) return false
-
-        Post post = (Post) o
-
-        if (author != post.author) return false
-        if (created != post.created) return false
-        if (id != post.id) return false
-
-        return true
+    void addLike(User user) {
+        this.likes.add(user)
     }
 
-    int hashCode() {
-        int result
-        result = (id != null ? id.hashCode() : 0)
-        result = 31 * result + (author != null ? author.hashCode() : 0)
-        result = 31 * result + (created != null ? created.hashCode() : 0)
-        return result
+    void removeLike(User user) {
+        this.likes.removeIf { it.id == user.id }
     }
 
 }

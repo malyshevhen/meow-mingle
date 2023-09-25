@@ -10,4 +10,9 @@ interface PostService {
     PostResponse update(String id, PostRequest request, String userId)
 
     void delete(String id, String username)
+
+    void addLike(String username, String postId)
+
+    void removeLike(String username, String postId)
+
 }

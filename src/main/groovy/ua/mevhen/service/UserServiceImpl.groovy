@@ -1,4 +1,4 @@
-package ua.mevhen.service.impl
+package ua.mevhen.service
 
 import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
@@ -12,7 +12,6 @@ import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.mapper.UserMapper
 import ua.mevhen.repository.UserRepository
-import ua.mevhen.service.UserService
 
 @Service
 @Slf4j

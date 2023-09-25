@@ -22,4 +22,8 @@ class CommentMapper {
         return new Comment(content: request.content)
     }
 
+    CommentRequest toRequest(Comment comment) {
+        return new CommentRequest(content: comment.content)
+    }
+
 }

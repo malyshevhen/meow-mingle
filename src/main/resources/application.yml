@@ -21,6 +21,11 @@ subscription:
     timeout: 500
     key-name: 'subscription-events'
 
+reaction:
+  worker:
+    timeout: 500
+    key-name: 'reaction-events'
+
 logging:
   level:
     root: INFO

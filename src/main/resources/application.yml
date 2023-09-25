@@ -16,12 +16,20 @@ spring:
       host: ${REDIS_HOST:127.0.0.1}
       port: ${REDIS_PORT:6379}
 
-subscription:
+subscription-task:
+  thread-pool:
+    thread-name-prefix: 'subscription-worker-'
+    core-pool-size: 2
+    max-pool-size: 4
   worker:
     timeout: 500
     key-name: 'subscription-events'
 
-reaction:
+reaction-task:
+  thread-pool:
+    thread-name-prefix: 'reaction-worker-'
+    core-pool-size: 2
+    max-pool-size: 4
   worker:
     timeout: 500
     key-name: 'reaction-events'

@@ -6,6 +6,7 @@ import jakarta.validation.constraints.NotNull
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.DocumentReference
 import org.springframework.data.mongodb.core.mapping.MongoId
@@ -51,6 +52,9 @@ class User {
 
     @LastModifiedDate
     private LocalDate updated
+
+    @Version
+    private Long version
 
     void subscribe(User sub) {
         sub.addSubscriber(this)

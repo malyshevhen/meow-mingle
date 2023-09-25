@@ -34,6 +34,15 @@ reaction-task:
     timeout: 500
     key-name: 'reaction-events'
 
+comment-task:
+  thread-pool:
+    thread-name-prefix: 'reaction-worker-'
+    core-pool-size: 2
+    max-pool-size: 4
+  worker:
+    timeout: 500
+    key-name: 'reaction-events'
+
 logging:
   level:
     root: INFO

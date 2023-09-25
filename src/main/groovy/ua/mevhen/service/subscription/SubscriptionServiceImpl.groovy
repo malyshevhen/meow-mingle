@@ -2,11 +2,11 @@ package ua.mevhen.service.subscription
 
 import groovy.util.logging.Slf4j
 import org.springframework.stereotype.Service
-import ua.mevhen.domain.dto.Subscription
+import ua.mevhen.domain.events.Subscription
 import ua.mevhen.service.UserService
 
-import static ua.mevhen.domain.dto.SubscriptionOperation.SUBSCRIBE
-import static ua.mevhen.domain.dto.SubscriptionOperation.UNSUBSCRIBE
+import static ua.mevhen.domain.events.SubscriptionOperation.SUBSCRIBE
+import static ua.mevhen.domain.events.SubscriptionOperation.UNSUBSCRIBE
 
 @Service
 @Slf4j

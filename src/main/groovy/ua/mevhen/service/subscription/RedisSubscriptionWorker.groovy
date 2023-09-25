@@ -3,7 +3,7 @@ package ua.mevhen.service.subscription
 import groovy.util.logging.Slf4j
 import org.springframework.data.redis.core.RedisTemplate
 import ua.mevhen.config.properties.SubscriptionServiceProperties
-import ua.mevhen.domain.dto.Subscription
+import ua.mevhen.domain.events.Subscription
 
 import java.time.Duration
 

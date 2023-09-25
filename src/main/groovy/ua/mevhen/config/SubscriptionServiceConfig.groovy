@@ -5,7 +5,7 @@ import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor
 import ua.mevhen.config.properties.SubscriptionServiceProperties
-import ua.mevhen.domain.dto.Subscription
+import ua.mevhen.domain.events.Subscription
 import ua.mevhen.service.subscription.RedisSubscriptionWorker
 import ua.mevhen.service.subscription.SubscriptionService
 

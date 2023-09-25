@@ -7,7 +7,8 @@ import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.data.redis.serializer.Jackson2JsonRedisSerializer
 import org.springframework.data.redis.serializer.RedisSerializer
 import org.springframework.data.redis.serializer.StringRedisSerializer
-import ua.mevhen.domain.dto.Subscription
+import ua.mevhen.domain.events.Reaction
+import ua.mevhen.domain.events.Subscription
 
 @Configuration
 class RedisConfig {

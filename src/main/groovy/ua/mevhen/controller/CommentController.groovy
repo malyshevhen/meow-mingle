@@ -1,5 +1,6 @@
 package ua.mevhen.controller
 
+import groovy.util.logging.Slf4j
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.DeleteMapping
@@ -15,6 +16,7 @@ import ua.mevhen.service.CommentService
 
 import java.security.Principal
 
+@Slf4j
 @RestController
 @RequestMapping('/api/posts/comment')
 class CommentController {
@@ -33,6 +35,7 @@ class CommentController {
         @RequestBody @Valid CommentRequest request
     ) {
         def username = principal.name
+        log.info("Request to comment post with ID: $postId by user: $username")
         commentService.save(username,postId, request)
     }
 
@@ -43,6 +46,7 @@ class CommentController {
         @RequestBody @Valid CommentRequest request
     ) {
         def username = principal.name
+        log.info("Request to update comment with ID: $commentId by user: $username")
         commentService.update(username, commentId, request)
     }
 
@@ -53,6 +57,7 @@ class CommentController {
         @PathVariable('commentId') String commentId
     ) {
         def username = principal.name
+        log.info("Request to delete comment with ID: $commentId by user: $username")
         commentService.delete(username, commentId)
     }
 

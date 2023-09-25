@@ -88,6 +88,11 @@ class UserServiceImpl implements UserService {
         log.info("Unsubscription of User: $username from user with ID: $subId completed.")
     }
 
+    @Override
+    boolean ifExists(String username) {
+        userRepository.existsByUsername(username)
+    }
+
     private void updateSubscriptions(
         String username,
         String subId,
@@ -108,10 +113,6 @@ class UserServiceImpl implements UserService {
                 log.error(message)
                 new UserNotFoundException(message)
             }
-    }
-
-    private boolean ifExists(String username) {
-        userRepository.existsByUsername(username)
     }
 
 }

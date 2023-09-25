@@ -21,8 +21,11 @@ class Comment {
     @MongoId
     private ObjectId id
 
-    @DocumentReference
+    @DocumentReference(lazy = true)
     private User author
+
+    @DocumentReference
+    private Post post
 
     private String content
 

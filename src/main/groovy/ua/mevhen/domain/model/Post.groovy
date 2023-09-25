@@ -5,6 +5,7 @@ import groovy.transform.ToString
 import org.bson.types.ObjectId
 import org.springframework.data.annotation.CreatedDate
 import org.springframework.data.annotation.LastModifiedDate
+import org.springframework.data.annotation.Version
 import org.springframework.data.mongodb.core.mapping.Document
 import org.springframework.data.mongodb.core.mapping.DocumentReference
 import org.springframework.data.mongodb.core.mapping.MongoId
@@ -47,12 +48,28 @@ class Post {
     @LastModifiedDate
     private LocalDate updated
 
+    @Version
+    private Long version
+
     void addLike(User user) {
         this.likes.add(user)
     }
 
     void removeLike(User user) {
         this.likes.removeIf { it.id == user.id }
+    }
+
+    void addComment(Comment comment) {
+        this.comments.add(comment)
+    }
+
+    void removeComment(Comment comment) {
+        this.comments.removeIf {it.id == comment.id}
+    }
+
+    void updateComment(Comment comment) {
+        removeComment(comment)
+        addComment(comment)
     }
 
 }

@@ -31,6 +31,16 @@ class PostServiceImpl implements PostService {
     }
 
     @Override
+    Post findById(String id) {
+        postRepository.findById(new ObjectId(id))
+            .orElseThrow { ->
+                final message = "Post with ID: $id not found."
+                log.error(message)
+                new PostNotFoundException(message)
+            }
+    }
+
+    @Override
     @Transactional
     PostResponse save(String username, PostRequest request) {
         def user = userService.findByUsername(username)
@@ -56,6 +66,19 @@ class PostServiceImpl implements PostService {
             log.error(message)
             throw new PermissionDeniedException(message)
         }
+    }
+
+    @Override
+    @Transactional
+    PostResponse update(Post post) {
+        if (post.id == null) {
+            def message = "Missing unique identifier."
+            log.error(message)
+            throw new IllegalArgumentException(message)
+        }
+        def updatedPost = postRepository.save(post)
+        log.info("Post ID: ${ post.id } updated successfully.")
+        return postMapper.toResponse(updatedPost)
     }
 
     @Override
@@ -105,15 +128,6 @@ class PostServiceImpl implements PostService {
         reactionAction(post, user)
 
         postRepository.save(post)
-    }
-
-    private Post findById(String id) {
-        postRepository.findById(new ObjectId(id))
-            .orElseThrow { ->
-                final message = "Post with ID: $id not found."
-                log.error(message)
-                new PostNotFoundException(message)
-            }
     }
 
 }

@@ -122,7 +122,6 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "test like and unlike operations"() {
         given:
-
         def publication = new PostRequest(content: 'test post')
 
         when:
@@ -150,6 +149,43 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         !post.likes.contains(user)
+    }
+
+    def "test updateComments method with valid post"() {
+        given:
+        def username = 'John Doe'
+        def postRequest = new PostRequest(content: 'New Post')
+        def postResponse = postService.save(username, postRequest)
+
+        when:
+        def post = postService.findById(postResponse.id)
+        post.content = 'Modified content'
+        def updatedResponse = postService.update(post)
+
+        then:
+        updatedResponse.content == 'Modified content'
+
+        cleanup:
+        postService.delete(postResponse.id, username)
+    }
+
+    def "test updateComments method with invalid post"() {
+        given:
+        def username = 'John Doe'
+        def postRequest = new PostRequest(content: 'New Post')
+        def postResponse = postService.save(username, postRequest)
+
+        when:
+        def post = postService.findById(postResponse.id)
+        post.id = null
+        post.content = 'Modified content'
+        postService.update(post)
+
+        then:
+        thrown IllegalArgumentException
+
+        cleanup:
+        postService.delete(postResponse.id, username)
     }
 
 }

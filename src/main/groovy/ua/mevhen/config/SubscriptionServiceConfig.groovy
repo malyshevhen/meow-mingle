@@ -1,5 +1,6 @@
 package ua.mevhen.config
 
+import org.springframework.beans.factory.annotation.Value
 import org.springframework.context.annotation.Bean
 import org.springframework.context.annotation.Configuration
 import org.springframework.data.redis.core.RedisTemplate
@@ -12,13 +13,22 @@ import ua.mevhen.service.subscription.SubscriptionService
 @Configuration
 class SubscriptionServiceConfig {
 
+    @Value('${subscription-task.thread-pool.thread-name-prefix}')
+    private String threadNamePrefix
+
+    @Value('${subscription-task.thread-pool.core-pool-size}')
+    private Integer corePoolSize
+
+    @Value('${subscription-task.thread-pool.max-pool-size}')
+    private Integer maxPoolSize
+
     @Bean
     ThreadPoolTaskExecutor redisSubscriptionTaskExecutor() {
         def executor = new ThreadPoolTaskExecutor()
 
-        executor.setCorePoolSize(1)
-        executor.setMaxPoolSize(1)
-        executor.setThreadNamePrefix("subscription-worker-")
+        executor.setCorePoolSize(this.corePoolSize)
+        executor.setMaxPoolSize(this.maxPoolSize)
+        executor.setThreadNamePrefix(this.threadNamePrefix)
         executor.initialize()
 
         return executor

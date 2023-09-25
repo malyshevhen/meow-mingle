@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class ReactionServiceProperties {
 
-    @Value('${reaction.worker.timeout}')
+    @Value('${reaction-task.worker.timeout}')
     private Integer timeout
 
-    @Value('${reaction.worker.key-name}')
+    @Value('${reaction-task.worker.key-name}')
     private String keyName
 
     Integer getTimeout() {

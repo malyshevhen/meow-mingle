@@ -129,6 +129,10 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
         then:
         !user1.subscriptions.contains(user2)
         !user2.subscribers.contains(user1)
+
+        cleanup:
+        userService.deleteById(user1.id.toString())
+        userService.deleteById(user2.id.toString())
     }
 
 }

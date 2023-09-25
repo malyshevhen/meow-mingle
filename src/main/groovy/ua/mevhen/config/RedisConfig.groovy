@@ -18,6 +18,11 @@ class RedisConfig {
         return buildRedisTemplate(connectionFactory, Subscription)
     }
 
+    @Bean
+    RedisTemplate<String, Reaction> redisReactionTemplate(RedisConnectionFactory connectionFactory) {
+        return buildRedisTemplate(connectionFactory, Reaction)
+    }
+
     private static <V> RedisTemplate<String, V> buildRedisTemplate(
         final RedisConnectionFactory connectionFactory,
         Class<V> valueType

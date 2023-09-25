@@ -6,10 +6,10 @@ import org.springframework.context.annotation.Configuration
 @Configuration
 class SubscriptionServiceProperties {
 
-    @Value('${subscription.worker.timeout}')
+    @Value('${subscription-task.worker.timeout}')
     private Integer timeout
 
-    @Value('${subscription.worker.key-name}')
+    @Value('${subscription-task.worker.key-name}')
     private String keyName
 
     Integer getTimeout() {

@@ -2,6 +2,8 @@ package ua.mevhen.service
 
 import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
+import org.springframework.data.domain.Page
+import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ua.mevhen.domain.dto.CommentRequest
@@ -75,6 +77,13 @@ class CommentServiceImpl implements CommentService {
             throw new PermissionDeniedException(message)
         }
         commentRepository.delete(commentToDelete)
+    }
+
+    @Override
+    Page<CommentResponse> getByPostId(String postId, Pageable pageable) {
+        return commentRepository
+            .findByPostId(new ObjectId(postId), pageable)
+            .map(commentMapper::toResponse)
     }
 
     private Comment findById(String commentId) {

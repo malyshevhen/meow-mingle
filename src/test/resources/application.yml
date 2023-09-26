@@ -35,4 +35,4 @@ logging:
     console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
     file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
   file:
-    name: 'log/tests/meow-mingle-test.log'
+    name: 'logs/tests/meow-mingle-test.log'

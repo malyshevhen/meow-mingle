@@ -1,0 +1,51 @@
+package ua.mevhen.service
+
+import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.data.domain.PageRequest
+import ua.mevhen.domain.dto.PostRequest
+import ua.mevhen.domain.dto.UserRegistration
+
+class FeedServiceIntegrationSpec extends AbstractIntegrationSpec {
+
+    @Autowired
+    FeedService feedService
+
+    @Autowired
+    UserService userService
+
+    @Autowired
+    PostService postService
+
+    def users = []
+    def posts = []
+
+    def setup() {
+        users = (1..2).collect {
+            return userService.save(
+                new UserRegistration(
+                    username: "User$it",
+                    email: "email$it@mail.com," +
+                        " Passw@rd$it"))
+        }
+
+        (1..5).each {
+            users.each { userInfo ->
+                def postRequest = new PostRequest(content: "test content: $it from ${ userInfo.username }")
+                posts.add(postService.save(userInfo.username, postRequest))
+            }
+        }
+    }
+
+    def "test retrieving feed"() {
+        given:
+        def pageable = PageRequest.of(0, 10)
+
+        when:
+        def feed = feedService.getFeed(users[0].username, pageable)
+
+        then:
+        feed.totalElements == 5
+        feed.totalPages == 1
+    }
+
+}

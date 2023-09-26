@@ -8,6 +8,10 @@ import ua.mevhen.domain.model.User
 class SecureUser implements UserDetails{
     @Delegate User user
 
+    SecureUser(User user) {
+        this.user = user
+    }
+
     @Override
     Collection<? extends GrantedAuthority> getAuthorities() {
         return [new SimpleGrantedAuthority(this.user.role)]

@@ -4,10 +4,12 @@ import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.data.mongodb.repository.MongoRepository
+import org.springframework.data.mongodb.repository.Query
 import ua.mevhen.domain.model.Post
 
 interface PostRepository extends MongoRepository<Post, ObjectId> {
 
-    Page<Post> findAllByAuthorUsername(String username, Pageable pageable)
+    @Query(value = "{'author.id': ?0}")
+    Page<Post> findByAuthorId(ObjectId id, Pageable pageable)
 
 }

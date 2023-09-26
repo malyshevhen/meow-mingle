@@ -1,6 +1,8 @@
 package ua.mevhen.controller
 
 import groovy.util.logging.Slf4j
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
@@ -8,6 +10,7 @@ import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
 import ua.mevhen.service.UserService
 
+@Tag(name = 'RegistrationController', description = 'Operations related to user registration')
 @RestController
 @RequestMapping('/api/user/register')
 @Slf4j
@@ -19,6 +22,11 @@ class RegistrationController {
         this.userService = userService
     }
 
+    @Operation(
+        summary = 'Register a new user',
+        description = 'Register a new user with the provided registration details.',
+        tags = ['RegistrationController']
+    )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     UserInfo register(@RequestBody @Valid UserRegistration regForm) {

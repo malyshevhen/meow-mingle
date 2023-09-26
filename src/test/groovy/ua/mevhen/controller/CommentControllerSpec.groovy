@@ -10,11 +10,8 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 import ua.mevhen.domain.dto.CommentRequest
-import ua.mevhen.domain.dto.CommentResponse
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.service.CommentService
-
-import java.time.LocalDate
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*

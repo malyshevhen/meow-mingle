@@ -6,18 +6,18 @@ services:
     container_name: 'mongo-db-meow-mingle'
     image: 'mongo:6.0'
     environment:
-      - MONGO_INITDB_DATABASE=${MONGODB_DATABASE}
-      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
-      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASSWORD}
+      MONGO_INITDB_DATABASE: meow-mingle-db
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: secret
     ports:
-      - '${MONGODB_PORT}:27017'
+      - '27017:27017'
 
   redis:
     container_name: 'redis-meow-mingle'
     image: 'redis:7.2.1'
     environment:
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
     ports:
-      - '${REDIS_PORT}:6379'
+      - '6379:6379'
     restart: on-failure

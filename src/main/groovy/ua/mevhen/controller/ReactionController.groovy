@@ -21,7 +21,6 @@ import static ua.mevhen.domain.events.ReactionOperation.LIKE
 import static ua.mevhen.domain.events.ReactionOperation.UNLIKE
 
 @Tag(name = 'ReactionController', description = 'Operations related to user reactions')
-@SecurityRequirement(name = "basicAuth")
 @RestController
 @RequestMapping('/api/reaction')
 @Slf4j

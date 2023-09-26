@@ -13,7 +13,6 @@ import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.service.UserService
 
 @Tag(name = 'UserController', description = 'Operations related to user management')
-@SecurityRequirement(name = "basicAuth")
 @RestController
 @RequestMapping('/api/user')
 @Slf4j

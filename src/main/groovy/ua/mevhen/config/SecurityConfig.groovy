@@ -36,7 +36,6 @@ class SecurityConfig {
                 it.requestMatchers(
                     '/v3/api-docs/**',
                     '/swagger-ui/**',
-                    '/swagger-ui.html',
                     '/api/user/register').permitAll()
                 it.anyRequest().authenticated()
             }

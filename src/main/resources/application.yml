@@ -6,12 +6,7 @@ spring:
     name: ${SPRING_APPLICATION_NAME:meow-mingle}
   data:
     mongodb:
-      database: ${MONGODB_DATABASE:meow-mingle-db}
-      host: ${MONGODB_HOST:127.0.0.1}
-      port: ${MONGODB_PORT:27017}
-      authentication-database: ${MONGODB_AUTH_DB:admin}
-      username: ${MONGODB_USERNAME:user}
-      password: ${MONGODB_PASSWORD:password}
+      uri: mongodb://mongoadmin:secret@localhost:27017/meow-mingle-db?authSource=admin
     redis:
       host: ${REDIS_HOST:127.0.0.1}
       port: ${REDIS_PORT:6379}

@@ -17,7 +17,6 @@ import ua.mevhen.service.PostService
 import java.security.Principal
 
 @Tag(name = "PostController", description = "Operations related to user posts")
-@SecurityRequirement(name = "basicAuth")
 @RestController
 @RequestMapping('/api/posts')
 @Slf4j

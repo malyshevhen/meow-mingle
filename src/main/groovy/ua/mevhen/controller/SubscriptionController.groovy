@@ -21,7 +21,6 @@ import static ua.mevhen.domain.events.SubscriptionOperation.SUBSCRIBE
 import static ua.mevhen.domain.events.SubscriptionOperation.UNSUBSCRIBE
 
 @Tag(name = 'SubscriptionController', description = 'Operations related to user subscriptions')
-@SecurityRequirement(name = "basicAuth")
 @RestController
 @RequestMapping('/api/user')
 @Slf4j

@@ -34,7 +34,8 @@ class FeedServiceImpl implements FeedService {
             log.error(message)
             throw new UserNotFoundException(message)
         }
-        def pageOfPosts = postRepository.findAllByAuthorUsername(username, pageable)
+        def user = userService.findByUsername(username)
+        def pageOfPosts = postRepository.findByAuthorId(user.id, pageable)
         log.info("Retrieve feed for user: '$username'.")
         return pageOfPosts.map(postMapper::toResponse)
     }

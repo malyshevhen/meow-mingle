@@ -3,7 +3,7 @@ package ua.mevhen.service
 import org.springframework.beans.factory.annotation.Autowired
 import ua.mevhen.domain.dto.*
 
-class CommentServiceImplSpec extends AbstractIntegrationSpec {
+class CommentServiceInegrationSpec extends AbstractIntegrationSpec {
 
     @Autowired
     CommentService commentService

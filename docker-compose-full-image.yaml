@@ -3,7 +3,7 @@ version: '3.9'
 services:
   app:
     container_name: meow-mingle-api
-    image: ghcr.io/malyshevhen/meow-mingle:pr-12
+    image: ghcr.io/malyshevhen/meow-mingle:pr-14
     environment:
       SPRING_DATA_MONGODB_URI: mongodb://mongoadmin:secret@mongo-db-meow-mingle:27017/meow-mingle-db?authSource=admin
       REDIS_HOST: redis-meow-mingle

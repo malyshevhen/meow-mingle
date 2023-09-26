@@ -30,9 +30,9 @@ class RegistrationController {
     @ResponseStatus(HttpStatus.CREATED)
     UserInfo register(@RequestBody UserRegistration regForm) {
         if (!regForm.validate()) throw new IllegalArgumentException("Registration details not valid.")
-        log.info("Received a registration request for username: ${ regForm.getUsername() }");
+        log.info("Received a registration request for username: ${ regForm.getUsername() }")
         def userInfo = userService.save(regForm)
-        log.info("User registered successfully with username: ${ regForm.getUsername() }");
+        log.info("User registered successfully with username: ${ regForm.getUsername() }")
         return userInfo
     }
 

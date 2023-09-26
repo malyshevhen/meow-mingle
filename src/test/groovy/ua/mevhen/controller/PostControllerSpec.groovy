@@ -1,7 +1,6 @@
 package ua.mevhen.controller
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import jakarta.validation.ConstraintViolationException
 import org.bson.types.ObjectId
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
@@ -27,8 +26,8 @@ class PostControllerSpec extends Specification {
         = new PostNotFoundException('PostNotFoundException')
     private static final PERMISSION_DENIED_EXCEPTION
         = new PermissionDeniedException('PermissionDeniedException')
-    private static final CONSTRAINT_VIOLATION_EXCEPTION
-        = new ConstraintViolationException('ConstraintViolationException', Set.of())
+    private static final ILLEGAL_ARGUMENT_EXCEPTION
+        = new IllegalArgumentException('IllegalArgumentException')
 
     @Autowired
     MockMvc mockMvc
@@ -65,7 +64,7 @@ class PostControllerSpec extends Specification {
         int httpStatus
     ) {
         given:
-        def postRequest = new PostRequest(content: '')
+        def postRequest = new PostRequest(content: 'Test Content')
 
         when:
         postService.save('John', postRequest) >> { throw exception }
@@ -75,9 +74,9 @@ class PostControllerSpec extends Specification {
         result.response.status == httpStatus
 
         where:
-        exception                      | httpStatus
-        CONSTRAINT_VIOLATION_EXCEPTION | 400
-        POST_NOT_FOUND_EXCEPTION       | 404
+        exception                  | httpStatus
+        ILLEGAL_ARGUMENT_EXCEPTION | 400
+        POST_NOT_FOUND_EXCEPTION   | 404
     }
 
     @WithMockUser(username = 'John')
@@ -107,7 +106,7 @@ class PostControllerSpec extends Specification {
     ) {
         given:
         def postId = new ObjectId().toString()
-        def postRequest = new PostRequest(content: '')
+        def postRequest = new PostRequest(content: 'Test Content')
 
         when:
         postService.update(postId, postRequest, 'John') >> { throw exception }
@@ -117,10 +116,10 @@ class PostControllerSpec extends Specification {
         result.response.status == httpStatus
 
         where:
-        exception                      | httpStatus
-        CONSTRAINT_VIOLATION_EXCEPTION | 400
-        PERMISSION_DENIED_EXCEPTION    | 403
-        POST_NOT_FOUND_EXCEPTION       | 404
+        exception                   | httpStatus
+        ILLEGAL_ARGUMENT_EXCEPTION  | 400
+        PERMISSION_DENIED_EXCEPTION | 403
+        POST_NOT_FOUND_EXCEPTION    | 404
     }
 
     @WithMockUser(username = 'John')
@@ -153,10 +152,10 @@ class PostControllerSpec extends Specification {
         result.response.status == httpStatus
 
         where:
-        exception                      | httpStatus
-        CONSTRAINT_VIOLATION_EXCEPTION | 400
-        PERMISSION_DENIED_EXCEPTION    | 403
-        POST_NOT_FOUND_EXCEPTION       | 404
+        exception                   | httpStatus
+        ILLEGAL_ARGUMENT_EXCEPTION  | 400
+        PERMISSION_DENIED_EXCEPTION | 403
+        POST_NOT_FOUND_EXCEPTION    | 404
     }
 
     private def performPost(PostRequest postRequest) {

@@ -3,7 +3,6 @@ package ua.mevhen.controller
 import groovy.util.logging.Slf4j
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
@@ -19,7 +18,7 @@ import ua.mevhen.service.UserService
 class UserController {
 
     private final UserService userService
-    
+
     UserController(UserService userService) {
         this.userService = userService
     }

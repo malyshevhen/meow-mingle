@@ -6,27 +6,19 @@ import io.swagger.v3.oas.annotations.media.Schema
 import io.swagger.v3.oas.annotations.responses.ApiResponse
 import io.swagger.v3.oas.annotations.responses.ApiResponses
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
-import jakarta.validation.constraints.NotNull
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.DeleteMapping
-import org.springframework.web.bind.annotation.GetMapping
-import org.springframework.web.bind.annotation.PathVariable
-import org.springframework.web.bind.annotation.PostMapping
-import org.springframework.web.bind.annotation.PutMapping
-import org.springframework.web.bind.annotation.RequestBody
-import org.springframework.web.bind.annotation.RequestMapping
-import org.springframework.web.bind.annotation.RequestParam
-import org.springframework.web.bind.annotation.ResponseStatus
-import org.springframework.web.bind.annotation.RestController
+import org.springframework.web.bind.annotation.*
 import ua.mevhen.domain.dto.CommentRequest
 import ua.mevhen.domain.dto.CommentResponse
 import ua.mevhen.service.CommentService
 
 import java.security.Principal
+
+import static ua.mevhen.constants.ValidationMessages.*
+import static ua.mevhen.utils.Validator.*
 
 @Tag(name = 'CommentController', description = 'Operations related to comments on posts')
 @Slf4j
@@ -43,17 +35,20 @@ class CommentController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = 'Create a new comment for a post')
     @ApiResponses(value = [
-        @ApiResponse(responseCode = '201', description = 'Comments created successfully'),
-        @ApiResponse(responseCode = '400', description = 'Comment request not valid'),
-        @ApiResponse(responseCode = '404', description = 'Post not found')
+        @ApiResponse(responseCode = '201', description = COMMENT_CREATED_MESSAGE),
+        @ApiResponse(responseCode = '400', description = INVALID_COMMENT_REQUEST_MESSAGE),
+        @ApiResponse(responseCode = '404', description = POST_NOT_FOUND_MESSAGE)
     ])
     @PostMapping('/{postId}')
     @ResponseStatus(HttpStatus.CREATED)
     void save(
         Principal principal,
         @PathVariable('postId') String postId,
-        @RequestBody @Schema(description = "Comment request") @Valid CommentRequest request
+        @RequestBody @Schema(description = "Comment request") CommentRequest request
     ) {
+        validateCommentRequest(request, INVALID_COMMENT_REQUEST_MESSAGE)
+        validateStringArg(postId, INVALID_POST_ID_MESSAGE)
+
         def username = principal.name
         log.info("Request to comment post with ID: $postId by user: $username")
         commentService.save(username, postId, request)
@@ -62,15 +57,21 @@ class CommentController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = 'Get comments by post ID')
     @ApiResponses(value = [
-        @ApiResponse(responseCode = '200', description = 'Comments retrieved successfully'),
-        @ApiResponse(responseCode = '404', description = 'Post not found')
+        @ApiResponse(responseCode = '200', description = COMMENT_RETRIEVED_MESSAGE),
+        @ApiResponse(responseCode = '400', description = INVALID_COMMENT_RETRIEVE_MESSAGE),
+        @ApiResponse(responseCode = '404', description = POST_NOT_FOUND_MESSAGE)
     ])
     @GetMapping('/{postId}')
     Page<CommentResponse> findByPostId(
         @PathVariable('postId') String postId,
-        @RequestParam('size') @NotNull Integer size,
-        @RequestParam('page') @NotNull Integer page
+        @RequestParam('size') Integer size,
+        @RequestParam('page') Integer page
     ) {
+        validatePageableArgs(size, page, INVALID_PAGEABLE_ARGS)
+        validateStringArg(postId, INVALID_POST_ID_MESSAGE)
+
+        log.info("Request to retrieve posts comments with PostID: $postId")
+
         def pageable = PageRequest.of(page, size)
         return commentService.getByPostId(postId, pageable)
     }
@@ -78,18 +79,22 @@ class CommentController {
     @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = 'Update a comment')
     @ApiResponses(value = [
-        @ApiResponse(responseCode = '200', description = 'Comments updated successfully'),
-        @ApiResponse(responseCode = '400', description = 'Comment request not valid'),
-        @ApiResponse(responseCode = '404', description = 'Post not found')
+        @ApiResponse(responseCode = '200', description = COMMENT_UPDATED_MESSAGE),
+        @ApiResponse(responseCode = '400', description = INVALID_COMMENT_REQUEST_MESSAGE),
+        @ApiResponse(responseCode = '404', description = POST_NOT_FOUND_MESSAGE)
     ])
     @PutMapping('/{commentId}')
     void update(
         Principal principal,
-        @PathVariable('commentId') @NotNull String commentId,
-        @RequestBody @Schema(description = 'Comment request') @Valid CommentRequest request
+        @PathVariable('commentId') String commentId,
+        @RequestBody @Schema(description = 'Comment request') CommentRequest request
     ) {
+        validateCommentRequest(request, INVALID_COMMENT_REQUEST_MESSAGE)
+        validateStringArg(commentId, INVALID_COMMENT_ID_MESSAGE)
+
         def username = principal.name
         log.info("Request to update comment with ID: $commentId by user: $username")
+
         commentService.update(username, commentId, request)
     }
 
@@ -99,10 +104,13 @@ class CommentController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void delete(
         Principal principal,
-        @PathVariable('commentId') @NotNull String commentId
+        @PathVariable('commentId') String commentId
     ) {
+        validateStringArg(commentId, INVALID_COMMENT_ID_MESSAGE)
+
         def username = principal.name
         log.info("Request to delete comment with ID: $commentId by user: $username")
+
         commentService.delete(username, commentId)
     }
 

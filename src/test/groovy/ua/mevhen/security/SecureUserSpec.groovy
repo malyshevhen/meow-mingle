@@ -16,7 +16,7 @@ class SecureUserSpec extends Specification {
             password: "testPassword",
             role: "ROLE_USER"
         )
-        def secureUser = new SecureUser(user: user)
+        def secureUser = new SecureUser(user)
 
         expect:
         secureUser instanceof UserDetails

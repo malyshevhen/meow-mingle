@@ -1,0 +1,31 @@
+version: '3.9'
+
+services:
+  app:
+    container_name: meow-mingle-api
+    build: .
+    environment:
+      SPRING_DATA_MONGODB_URI: mongodb://mongoadmin:secret@mongo-db-meow-mingle:27017/meow-mingle-db?authSource=admin
+      REDIS_HOST: redis-meow-mingle
+      REDIS_PORT: 6379
+    ports:
+      - '8080:8080'
+    depends_on:
+      - mongodb
+      - redis
+
+  mongodb:
+    container_name: 'mongo-db-meow-mingle'
+    image: 'mongo:6.0'
+    environment:
+      MONGO_INITDB_DATABASE: meow-mingle-db
+      MONGO_INITDB_ROOT_USERNAME: mongoadmin
+      MONGO_INITDB_ROOT_PASSWORD: secret
+
+  redis:
+    container_name: 'redis-meow-mingle'
+    image: 'redis:7.2.1'
+    environment:
+      REDIS_HOST: 127.0.0.1
+      REDIS_PORT: 6379
+    restart: on-failure

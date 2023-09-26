@@ -1,0 +1,38 @@
+spring:
+  application:
+    name: 'meow-mingle'
+  data:
+    mongodb:
+      uri: 'mongodb://localhost:27017/meow-mingle'
+    redis:
+      host: '127.0.0.1'
+      port: 6379
+
+subscription-task:
+  thread-pool:
+    thread-name-prefix: 'subscription-worker-'
+    core-pool-size: 2
+    max-pool-size: 4
+  worker:
+    timeout: 500
+    key-name: 'subscription-events'
+
+reaction-task:
+  thread-pool:
+    thread-name-prefix: 'reaction-worker-'
+    core-pool-size: 2
+    max-pool-size: 4
+  worker:
+    timeout: 500
+    key-name: 'reaction-events'
+
+logging:
+  level:
+    root: INFO
+    org.springframework.web: INFO
+    ua.mevhen: INFO
+  pattern:
+    console: "%d{HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+    file: "%d{yyyy-MM-dd HH:mm:ss} [%thread] %-5level %logger{36} - %msg%n"
+  file:
+    name: 'logs/tests/meow-mingle-test.log'

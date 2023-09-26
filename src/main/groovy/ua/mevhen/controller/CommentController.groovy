@@ -27,8 +27,7 @@ import ua.mevhen.service.CommentService
 
 import java.security.Principal
 
-@Tag(name = "CommentController",
-    description = "Operations related to comments on posts")
+@Tag(name = 'CommentController', description = 'Operations related to comments on posts')
 @Slf4j
 @RestController
 @RequestMapping('/api/posts/comment')
@@ -42,7 +41,7 @@ class CommentController {
 
     @Operation(summary = 'Create a new comment for a post')
     @ApiResponses(value = [
-        @ApiResponse(responseCode = "201", description = 'Comments created successfully'),
+        @ApiResponse(responseCode = '201', description = 'Comments created successfully'),
         @ApiResponse(responseCode = '400', description = 'Comment request not valid'),
         @ApiResponse(responseCode = '404', description = 'Post not found')
     ])
@@ -73,9 +72,9 @@ class CommentController {
         return commentService.getByPostId(postId, pageable)
     }
 
-    @Operation(summary = "Update a comment")
+    @Operation(summary = 'Update a comment')
     @ApiResponses(value = [
-        @ApiResponse(responseCode = "200", description = 'Comments updated successfully'),
+        @ApiResponse(responseCode = '200', description = 'Comments updated successfully'),
         @ApiResponse(responseCode = '400', description = 'Comment request not valid'),
         @ApiResponse(responseCode = '404', description = 'Post not found')
     ])
@@ -83,14 +82,14 @@ class CommentController {
     void update(
         Principal principal,
         @PathVariable('commentId') @NotNull String commentId,
-        @RequestBody @Schema(description = "Comment request") @Valid CommentRequest request
+        @RequestBody @Schema(description = 'Comment request') @Valid CommentRequest request
     ) {
         def username = principal.name
         log.info("Request to update comment with ID: $commentId by user: $username")
         commentService.update(username, commentId, request)
     }
 
-    @Operation(summary = "Delete a comment")
+    @Operation(summary = 'Delete a comment')
     @DeleteMapping('/{commentId}')
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void delete(

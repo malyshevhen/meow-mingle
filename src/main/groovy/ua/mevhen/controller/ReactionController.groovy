@@ -1,7 +1,11 @@
 package ua.mevhen.controller
 
 import groovy.util.logging.Slf4j
+import io.swagger.v3.oas.annotations.Operation
+import io.swagger.v3.oas.annotations.Parameter
 import io.swagger.v3.oas.annotations.security.SecurityRequirement
+import io.swagger.v3.oas.annotations.tags.Tag
+import jakarta.validation.constraints.NotNull
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
@@ -15,6 +19,7 @@ import java.security.Principal
 import static ua.mevhen.domain.events.ReactionOperation.LIKE
 import static ua.mevhen.domain.events.ReactionOperation.UNLIKE
 
+@Tag(name = 'ReactionController', description = 'Operations related to user reactions')
 @SecurityRequirement(name = "basicAuth")
 @RestController
 @RequestMapping('/api/reaction')
@@ -32,20 +37,30 @@ class ReactionController {
         this.properties = properties
     }
 
+    @Operation(
+        summary = 'Add a like reaction to a post',
+        description = 'Add a like reaction to a post for the authenticated user.',
+        tags = ['ReactionController']
+    )
     @PostMapping('/like/{postId}')
     void addReaction(
         Principal principal,
-        @PathVariable('postId') String postId
+        @PathVariable('postId') @Parameter(description = "Post ID") @NotNull String postId
     ) {
         def reaction = new Reaction(principal.name, postId, LIKE)
         log.info("User: '${ principal.name }' request to like post: '$postId'.")
         redisReactionTemplate.opsForList().leftPush(properties.keyName, reaction)
     }
 
+    @Operation(
+        summary = 'Remove a like reaction from a post',
+        description = 'Remove a like reaction from a post for the authenticated user.',
+        tags = ['ReactionController']
+    )
     @PostMapping('/unlike/{postId}')
     void removeReaction(
         Principal principal,
-        @PathVariable('postId') String postId
+        @PathVariable('postId') @Parameter(description = "Post ID") String postId
     ) {
         def reaction = new Reaction(principal.name, postId, UNLIKE)
         log.info("User: '${ principal.name }' request to remove like from post: '$postId'.")

@@ -3,7 +3,6 @@ package ua.mevhen.controller
 import groovy.util.logging.Slf4j
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotNull
 import org.springframework.data.redis.core.RedisTemplate

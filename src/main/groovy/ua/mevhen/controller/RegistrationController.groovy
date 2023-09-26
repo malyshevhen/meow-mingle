@@ -3,7 +3,6 @@ package ua.mevhen.controller
 import groovy.util.logging.Slf4j
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
 import org.springframework.http.HttpStatus
 import org.springframework.web.bind.annotation.*
 import ua.mevhen.domain.dto.UserInfo
@@ -29,10 +28,11 @@ class RegistrationController {
     )
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    UserInfo register(@RequestBody @Valid UserRegistration regForm) {
-        log.info("Received a registration request for username: ${ regForm.getUsername() }");
+    UserInfo register(@RequestBody UserRegistration regForm) {
+        if (!regForm.validate()) throw new IllegalArgumentException("Registration details not valid.")
+        log.info("Received a registration request for username: ${ regForm.getUsername() }")
         def userInfo = userService.save(regForm)
-        log.info("User registered successfully with username: ${ regForm.getUsername() }");
+        log.info("User registered successfully with username: ${ regForm.getUsername() }")
         return userInfo
     }
 

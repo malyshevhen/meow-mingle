@@ -3,7 +3,6 @@ package ua.mevhen.controller
 import groovy.util.logging.Slf4j
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotBlank
 import org.springframework.data.redis.core.RedisTemplate
@@ -17,8 +16,10 @@ import ua.mevhen.domain.events.Subscription
 
 import java.security.Principal
 
+import static ua.mevhen.constants.ValidationMessages.INVALID_USER_ID_MESSAGE
 import static ua.mevhen.domain.events.SubscriptionOperation.SUBSCRIBE
 import static ua.mevhen.domain.events.SubscriptionOperation.UNSUBSCRIBE
+import static ua.mevhen.utils.Validator.validateStringArg
 
 @Tag(name = 'SubscriptionController', description = 'Operations related to user subscriptions')
 @RestController
@@ -28,7 +29,7 @@ class SubscriptionController {
 
     private final RedisTemplate<String, Subscription> redisSubscriptionTemplate
     private final SubscriptionServiceProperties properties
-    
+
     SubscriptionController(
         RedisTemplate<String, Subscription> redisSubscriptionTemplate,
         SubscriptionServiceProperties properties
@@ -46,10 +47,13 @@ class SubscriptionController {
     @PostMapping('/subscribe/{userId}')
     void subscribe(
         Principal principal,
-        @PathVariable('userId') @Parameter(description = "User ID of subscription") @NotBlank String subId
+        @PathVariable('userId') @Parameter(description = "User ID of subscription") String subId
     ) {
+        validateStringArg(subId, INVALID_USER_ID_MESSAGE)
+
         def subscription = new Subscription(principal.getName(), subId, SUBSCRIBE)
         log.info("User ${ principal.name } request for subscription to $subId")
+
         redisSubscriptionTemplate.opsForList().leftPush(properties.keyName, subscription)
     }
 
@@ -64,8 +68,11 @@ class SubscriptionController {
         Principal principal,
         @PathVariable('userId') @Parameter(description = 'User ID of subscription') @NotBlank String subId
     ) {
+        validateStringArg(subId, INVALID_USER_ID_MESSAGE)
+
         def subscription = new Subscription(principal.getName(), subId, UNSUBSCRIBE)
         log.info("User ${ principal.name } request to unsubscribe from user $subId")
+
         redisSubscriptionTemplate.opsForList().leftPush('subscription-events', subscription)
     }
 }

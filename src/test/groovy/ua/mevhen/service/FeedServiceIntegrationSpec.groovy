@@ -3,7 +3,10 @@ package ua.mevhen.service
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
 import ua.mevhen.domain.dto.PostRequest
+import ua.mevhen.domain.dto.PostResponse
+import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.service.subscription.SubscriptionService
 
 class FeedServiceIntegrationSpec extends AbstractIntegrationSpec {
 
@@ -16,8 +19,11 @@ class FeedServiceIntegrationSpec extends AbstractIntegrationSpec {
     @Autowired
     PostService postService
 
-    def users = []
-    def posts = []
+    @Autowired
+    SubscriptionService subscriptionService
+
+    def users = new ArrayList<UserInfo>()
+    def posts = new ArrayList<PostResponse>()
 
     def setup() {
         users = (1..2).collect {
@@ -41,6 +47,7 @@ class FeedServiceIntegrationSpec extends AbstractIntegrationSpec {
         def pageable = PageRequest.of(0, 10)
 
         when:
+        userService.subscribe(users[0].username, users[1].id)
         def feed = feedService.getFeed(users[0].username, pageable)
 
         then:

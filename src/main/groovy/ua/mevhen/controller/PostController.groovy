@@ -3,10 +3,7 @@ package ua.mevhen.controller
 import groovy.util.logging.Slf4j
 import io.swagger.v3.oas.annotations.Operation
 import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.Valid
-import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
@@ -15,6 +12,10 @@ import ua.mevhen.domain.dto.PostResponse
 import ua.mevhen.service.PostService
 
 import java.security.Principal
+
+import static ua.mevhen.constants.ValidationMessages.INVALID_POST_CONTENT_MESSAGE
+import static ua.mevhen.constants.ValidationMessages.INVALID_POST_ID_MESSAGE
+import static ua.mevhen.utils.Validator.validateStringArg
 
 @Tag(name = "PostController", description = "Operations related to user posts")
 @RestController
@@ -38,10 +39,13 @@ class PostController {
     @ResponseStatus(HttpStatus.CREATED)
     PostResponse post(
         Principal principal,
-        @RequestBody @Valid PostRequest postRequest
+        @RequestBody PostRequest postRequest
     ) {
+        validateStringArg(postRequest.content, INVALID_POST_CONTENT_MESSAGE)
+
         def username = principal.getName()
         log.info("User '$username' is posting a new post")
+
         return postService.save(username, postRequest)
     }
 
@@ -55,10 +59,14 @@ class PostController {
     PostResponse update(
         Principal principal,
         @PathVariable('id') @Parameter(description = "Post ID") String id,
-        @RequestBody @Valid PostRequest request
+        @RequestBody PostRequest request
     ) {
+        validateStringArg(request.content, INVALID_POST_CONTENT_MESSAGE)
+        validateStringArg(id, INVALID_POST_ID_MESSAGE)
+
         def username = principal.getName()
         log.info("User '$username' is updating post with ID: $id")
+
         return postService.update(id, request, username)
     }
 
@@ -72,10 +80,13 @@ class PostController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     void delete(
         Principal principal,
-        @PathVariable('id') @Parameter(description = "Post ID") @NotBlank String id
+        @PathVariable('id') @Parameter(description = "Post ID") String id
     ) {
+        validateStringArg(id, INVALID_POST_ID_MESSAGE)
+
         def username = principal.getName()
         log.info("User '$username' is deleting post with ID: $id")
+
         postService.delete(id, username)
     }
 

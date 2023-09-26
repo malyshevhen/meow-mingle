@@ -9,7 +9,7 @@ import ua.mevhen.domain.model.Post
 
 interface PostRepository extends MongoRepository<Post, ObjectId> {
 
-    @Query(value = "{'author.id': ?0}")
-    Page<Post> findByAuthorId(ObjectId id, Pageable pageable)
+    @Query(value = "{'author.id': {'\$in': ?0} }")
+    Page<Post> findAllByAuthorsId(List<ObjectId> id, Pageable pageable)
 
 }

@@ -8,6 +8,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.Valid
 import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import ua.mevhen.domain.dto.PostRequest
 import ua.mevhen.domain.dto.PostResponse
@@ -28,6 +29,7 @@ class PostController {
         this.postService = postService
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = "Create a new post",
         description = "Create a new post for the authenticated user.",
@@ -44,6 +46,7 @@ class PostController {
         return postService.save(username, postRequest)
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = "Update a post",
         description = "Update an existing post for the authenticated user.",
@@ -60,6 +63,7 @@ class PostController {
         return postService.update(id, request, username)
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = "Delete a post",
         description = "Delete an existing post for the authenticated user.",

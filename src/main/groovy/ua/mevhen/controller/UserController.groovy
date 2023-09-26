@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotBlank
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.*
 import ua.mevhen.domain.dto.UserInfo
 import ua.mevhen.service.UserService
@@ -24,6 +25,7 @@ class UserController {
         this.userService = userService
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = 'Update user username',
         description = 'Update the username of a user by providing their user ID and a new username.',
@@ -39,6 +41,7 @@ class UserController {
         return updatedUserInfo
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = 'Delete user by ID',
         description = 'Delete a user by providing their user ID.',

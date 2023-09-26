@@ -20,9 +20,12 @@ class UserSecurityService implements UserDetailsService {
     @Override
     UserDetails loadUserByUsername(String username) {
         def user = userRepository.findByUsername(username)
+            .map(SecureUser::new)
             .orElseThrow { -> new UsernameNotFoundException("Username: $username not found.") }
+
         log.info("Loaded UserDetails for username: $username")
-        return new SecureUser(user: user)
+
+        return user
     }
 
 }

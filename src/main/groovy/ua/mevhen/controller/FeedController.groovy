@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotNull
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.RequestMapping
@@ -29,6 +30,7 @@ class FeedController {
         this.feedService = feedService
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = "Get owner's feed",
         description = "Retrieve the feed for the authenticated owner user.",
@@ -48,6 +50,7 @@ class FeedController {
         return feedPage
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = "Get user's feed",
         description = "Retrieve the feed for a specific user.",

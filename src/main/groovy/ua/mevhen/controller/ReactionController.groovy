@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotNull
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -37,6 +38,7 @@ class ReactionController {
         this.properties = properties
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = 'Add a like reaction to a post',
         description = 'Add a like reaction to a post for the authenticated user.',
@@ -52,6 +54,7 @@ class ReactionController {
         redisReactionTemplate.opsForList().leftPush(properties.keyName, reaction)
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = 'Remove a like reaction from a post',
         description = 'Remove a like reaction from a post for the authenticated user.',

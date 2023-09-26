@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.security.SecurityRequirement
 import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotBlank
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -37,6 +38,7 @@ class SubscriptionController {
         this.properties = properties
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = 'Subscribe to a user',
         description = 'Subscribe to another user by providing their user ID.',
@@ -52,6 +54,7 @@ class SubscriptionController {
         redisSubscriptionTemplate.opsForList().leftPush(properties.keyName, subscription)
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(
         summary = 'Unsubscribe from a user',
         description = 'Unsubscribe from another user by providing their user ID.',

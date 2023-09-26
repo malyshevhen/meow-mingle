@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotNull
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.PageRequest
 import org.springframework.http.HttpStatus
+import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.GetMapping
 import org.springframework.web.bind.annotation.PathVariable
@@ -39,6 +40,7 @@ class CommentController {
         this.commentService = commentService
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = 'Create a new comment for a post')
     @ApiResponses(value = [
         @ApiResponse(responseCode = '201', description = 'Comments created successfully'),
@@ -57,6 +59,7 @@ class CommentController {
         commentService.save(username, postId, request)
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = 'Get comments by post ID')
     @ApiResponses(value = [
         @ApiResponse(responseCode = '200', description = 'Comments retrieved successfully'),
@@ -72,6 +75,7 @@ class CommentController {
         return commentService.getByPostId(postId, pageable)
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = 'Update a comment')
     @ApiResponses(value = [
         @ApiResponse(responseCode = '200', description = 'Comments updated successfully'),
@@ -89,6 +93,7 @@ class CommentController {
         commentService.update(username, commentId, request)
     }
 
+    @PreAuthorize("hasRole('ROLE_USER')")
     @Operation(summary = 'Delete a comment')
     @DeleteMapping('/{commentId}')
     @ResponseStatus(HttpStatus.NO_CONTENT)

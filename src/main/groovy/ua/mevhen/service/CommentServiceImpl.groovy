@@ -6,9 +6,9 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ua.mevhen.domain.dto.CommentRequest
-import ua.mevhen.domain.dto.CommentResponse
 import ua.mevhen.domain.model.Comment
+import ua.mevhen.dto.CommentRequest
+import ua.mevhen.dto.CommentResponse
 import ua.mevhen.exceptions.CommentNotFoundException
 import ua.mevhen.exceptions.PermissionDeniedException
 import ua.mevhen.mapper.CommentMapper

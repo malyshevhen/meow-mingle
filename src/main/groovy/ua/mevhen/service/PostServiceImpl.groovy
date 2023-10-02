@@ -4,9 +4,9 @@ import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ua.mevhen.domain.dto.PostRequest
-import ua.mevhen.domain.dto.PostResponse
+import ua.mevhen.dto.PostResponse
 import ua.mevhen.domain.model.Post
+import ua.mevhen.dto.PostRequest
 import ua.mevhen.exceptions.PermissionDeniedException
 import ua.mevhen.exceptions.PostNotFoundException
 import ua.mevhen.mapper.PostMapper

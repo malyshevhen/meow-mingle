@@ -1,9 +1,13 @@
 package ua.mevhen.service
 
 import org.springframework.beans.factory.annotation.Autowired
-import ua.mevhen.domain.dto.*
+import ua.mevhen.dto.CommentRequest
+import ua.mevhen.dto.PostRequest
+import ua.mevhen.dto.PostResponse
+import ua.mevhen.dto.UserInfo
+import ua.mevhen.dto.UserRegistration
 
-class CommentServiceInegrationSpec extends AbstractIntegrationSpec {
+class CommentServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     @Autowired
     CommentService commentService
@@ -32,10 +36,16 @@ class CommentServiceInegrationSpec extends AbstractIntegrationSpec {
         post = postService.save(userRegistration.username, postRequest)
     }
 
+    def cleanup() {
+        postService.delete(post.id, user.username)
+        userService.deleteById(user.id)
+    }
+
     def "test comment operations"() {
         given:
         def content = 'Test comment.🤕'
-        def commentRequest = new CommentRequest(content)
+        def commentRequest = new CommentRequest()
+        commentRequest.content(content)
 
         when:
         def savedComment = commentService.save(user.username, post.id, commentRequest)
@@ -49,7 +59,8 @@ class CommentServiceInegrationSpec extends AbstractIntegrationSpec {
 
         when:
         def contentForUpdate = "Updated test comment!"
-        def requestForUpdate = new CommentRequest(contentForUpdate)
+        def requestForUpdate = new CommentRequest()
+        requestForUpdate.content = contentForUpdate
         def updatedComment = commentService.update(user.username, savedComment.id, requestForUpdate)
         def updatedPost = postService.findById(post.id)
 

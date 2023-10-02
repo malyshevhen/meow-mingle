@@ -2,8 +2,8 @@ package ua.mevhen.mapper
 
 import org.bson.types.ObjectId
 import spock.lang.Specification
-import ua.mevhen.domain.dto.UserInfo
-import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.dto.UserInfo
+import ua.mevhen.dto.UserRegistration
 import ua.mevhen.domain.model.User
 
 class UserMapperSpec extends Specification {

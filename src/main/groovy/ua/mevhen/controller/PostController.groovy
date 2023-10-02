@@ -1,93 +1,108 @@
 package ua.mevhen.controller
 
 import groovy.util.logging.Slf4j
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.tags.Tag
-import org.springframework.http.HttpStatus
+import org.springframework.data.domain.PageRequest
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.*
-import ua.mevhen.domain.dto.PostRequest
-import ua.mevhen.domain.dto.PostResponse
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import ua.mevhen.api.PostsApi
+import ua.mevhen.dto.CommentRequest
+import ua.mevhen.dto.PageComments
+import ua.mevhen.dto.PostRequest
+import ua.mevhen.service.CommentService
 import ua.mevhen.service.PostService
 
-import java.security.Principal
-
-import static ua.mevhen.constants.ValidationMessages.INVALID_POST_CONTENT_MESSAGE
-import static ua.mevhen.constants.ValidationMessages.INVALID_POST_ID_MESSAGE
-import static ua.mevhen.utils.Validator.validateStringArg
-
-@Tag(name = "PostController", description = "Operations related to user posts")
-@RestController
-@RequestMapping('/api/posts')
 @Slf4j
-class PostController {
+@RestController
+@RequestMapping('/api')
+class PostController implements PostsApi {
 
     private final PostService postService
+    private final CommentService commentService
 
-    PostController(PostService postService) {
+    PostController(PostService postService, CommentService commentService) {
         this.postService = postService
+        this.commentService = commentService
     }
 
+    @Override
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(
-        summary = "Create a new post",
-        description = "Create a new post for the authenticated user.",
-        tags = ["PostController"]
-    )
-    @PostMapping
-    @ResponseStatus(HttpStatus.CREATED)
-    PostResponse post(
-        Principal principal,
-        @RequestBody PostRequest postRequest
-    ) {
-        validateStringArg(postRequest.content, INVALID_POST_CONTENT_MESSAGE)
-
-        def username = principal.getName()
+    ResponseEntity<Void> publishPost(PostRequest postRequest) {
+        def authentication = SecurityContextHolder.context.authentication
+        def username = authentication.name
         log.info("User '$username' is posting a new post")
+        postService.save(username, postRequest)
 
-        return postService.save(username, postRequest)
+        return ResponseEntity.status(201).build()
     }
 
+    @Override
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(
-        summary = "Update a post",
-        description = "Update an existing post for the authenticated user.",
-        tags = ["PostController"]
-    )
-    @PutMapping('/{id}')
-    PostResponse update(
-        Principal principal,
-        @PathVariable('id') @Parameter(description = "Post ID") String id,
-        @RequestBody PostRequest request
-    ) {
-        validateStringArg(request.content, INVALID_POST_CONTENT_MESSAGE)
-        validateStringArg(id, INVALID_POST_ID_MESSAGE)
-
-        def username = principal.getName()
+    ResponseEntity<Void> updatePost(String id, PostRequest request) {
+        def authentication = SecurityContextHolder.context.authentication
+        def username = authentication.name
         log.info("User '$username' is updating post with ID: $id")
+        postService.update(id, request, username)
 
-        return postService.update(id, request, username)
+        return ResponseEntity.ok().build()
     }
 
+    @Override
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(
-        summary = "Delete a post",
-        description = "Delete an existing post for the authenticated user.",
-        tags = ["PostController"]
-    )
-    @DeleteMapping('/{id}')
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    void delete(
-        Principal principal,
-        @PathVariable('id') @Parameter(description = "Post ID") String id
-    ) {
-        validateStringArg(id, INVALID_POST_ID_MESSAGE)
-
-        def username = principal.getName()
+    ResponseEntity<Void> deletePost(String id) {
+        def authentication = SecurityContextHolder.context.authentication
+        def username = authentication.name
         log.info("User '$username' is deleting post with ID: $id")
-
         postService.delete(id, username)
+
+        return ResponseEntity.status(204).build()
     }
 
+    @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
+    ResponseEntity<Void> addComment(String postId, CommentRequest request) {
+        def authentication = SecurityContextHolder.context.authentication
+        def username = authentication.name
+        log.info("Request to comment post with ID: $postId by user: $username")
+        commentService.save(username, postId, request)
+
+        return ResponseEntity.status(201).build()
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
+    ResponseEntity<PageComments> getPostComments(String postId, Integer size, Integer page) {
+        log.info("Request to retrieve posts comments with PostID: $postId")
+
+        def pageable = PageRequest.of(page, size)
+        def postComments = commentService.getByPostId(postId, pageable)
+
+        return ResponseEntity.of(Optional.ofNullable(postComments))
+            .status(200)
+            .build()
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
+    ResponseEntity<Void> updateComment(String commentId, CommentRequest request) {
+        def authentication = SecurityContextHolder.context.authentication
+        def username = authentication.name
+        log.info("Request to update comment with ID: $commentId by user: $username")
+        commentService.update(username, commentId, request)
+
+        return ResponseEntity.status(200).build()
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
+    ResponseEntity<Void> deleteCommentById(String commentId) {
+        def authentication = SecurityContextHolder.context.authentication
+        def username = authentication.name
+        log.info("Request to delete comment with ID: $commentId by user: $username")
+        commentService.delete(username, commentId)
+
+        return ResponseEntity.status(204).build()
+    }
 }

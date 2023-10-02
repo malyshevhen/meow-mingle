@@ -12,14 +12,16 @@ import ua.mevhen.service.AbstractIntegrationSpec
 import ua.mevhen.service.PostService
 import ua.mevhen.service.UserService
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
 @AutoConfigureMockMvc
 class ReactionControllerSpec extends AbstractIntegrationSpec {
 
-    private static USERNAME = 'John'
-    private static POST_ID = new ObjectId().toString()
+    private static final REACTIONS_LIKES_URL = "/api/reactions/like"
+    private static final USERNAME = 'John'
+    private static final POST_ID = new ObjectId().toString()
 
     @Autowired
     MockMvc mockMvc
@@ -34,7 +36,8 @@ class ReactionControllerSpec extends AbstractIntegrationSpec {
     @WithMockUser(username = 'John')
     def "should add a like reaction"() {
         when:
-        def result = mockMvc.perform(post("/api/reaction/like/{postId}", POST_ID))
+        def result = mockMvc.perform(post(REACTIONS_LIKES_URL)
+            .param('postId', POST_ID))
         userService.findByUsername(USERNAME) >> new User()
         Thread.sleep(100)
 
@@ -48,7 +51,8 @@ class ReactionControllerSpec extends AbstractIntegrationSpec {
     @WithMockUser(username = "John")
     def "should remove a like reaction"() {
         when:
-        def result = mockMvc.perform(post("/api/reaction/unlike/{postId}", POST_ID))
+        def result = mockMvc.perform(delete(REACTIONS_LIKES_URL)
+            .param('postId', POST_ID))
         userService.findByUsername(USERNAME) >> new User()
         Thread.sleep(100)
 

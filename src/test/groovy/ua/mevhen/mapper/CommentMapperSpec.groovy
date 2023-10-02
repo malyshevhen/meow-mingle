@@ -4,7 +4,7 @@ import org.bson.types.ObjectId
 import spock.lang.Specification
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.boot.test.context.SpringBootTest
-import ua.mevhen.domain.dto.CommentRequest
+import ua.mevhen.dto.CommentRequest
 import ua.mevhen.domain.model.Comment
 import ua.mevhen.domain.model.User
 

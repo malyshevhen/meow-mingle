@@ -1,8 +1,8 @@
 package ua.mevhen.mapper
 
 import org.springframework.stereotype.Component
-import ua.mevhen.domain.dto.CommentRequest
-import ua.mevhen.domain.dto.CommentResponse
+import ua.mevhen.dto.CommentRequest
+import ua.mevhen.dto.CommentResponse
 import ua.mevhen.domain.model.Comment
 
 @Component

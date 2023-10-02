@@ -1,0 +1,687 @@
+openapi: '3.0.3'
+
+info:
+  title: Meow Mingle social media app
+  version: 0.0.1
+
+servers:
+  - url: http://127.0.0.1
+
+tags:
+  - name: Comment Controller
+  - name: Feed Controller
+  - name: Post Controller
+  - name: Reaction Controller
+  - name: Subscription Controller
+  - name: User Controller
+
+paths:
+  /users/registration:
+    post:
+      tags:
+        - Registration Controller
+      operationId: register
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/UserRegistration'
+      responses:
+        201:
+          description: User registered
+        400:
+          description: Request not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users/subscriptions:
+    post:
+      tags:
+        - Subscription controller
+      operationId: subscribe
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        200:
+          description: Subscribed successfully
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Subscription controller
+      operationId: unsubscribe
+      parameters:
+        - name: userId
+          in: query
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        200:
+          description: Unsubscribed successfully
+        404:
+          description: User not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /users:
+    put:
+      tags:
+        - User Controller
+      operationId: updateUsername
+      parameters:
+        - name: username
+          in: query
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        200:
+          description: Username updated successfully
+        400:
+          description: Username not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - User Controller
+      operationId: deleteUser
+      responses:
+        200:
+          description: Username updated successfully
+        400:
+          description: Username not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+  /posts/comments:
+    post:
+      tags:
+        - Comment Controller
+      operationId: addComment
+      parameters:
+        - name: postId
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        201:
+          description: Comment added successfully
+        400:
+          description: Request not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    get:
+      tags:
+        - Comment Controller
+      operationId: getPostComments
+      parameters:
+        - name: postId
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: size
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Comment retrieved successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PageComments'
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    put:
+      tags:
+        - Comment Controller
+      description: Update comment
+      operationId: updateComment
+      parameters:
+        - name: commentId
+          in: query
+          required: true
+          schema:
+            type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/CommentRequest'
+      responses:
+        200:
+          description: Comment updated successfully
+        400:
+          description: Request not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Comment Controller
+      description: Delete existing comment
+      operationId: deleteCommentById
+      parameters:
+        - name: commentId
+          in: query
+          required: true
+          schema:
+            type: string
+      responses:
+        204:
+          description: Comment deleted successfully
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /feed:
+    get:
+      tags:
+        - Feed Controller
+      description: Get owner feed
+      operationId: getOwnFeed
+      parameters:
+        - name: size
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Feed retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePost'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /feed/{username}:
+    get:
+      tags:
+        - Feed Controller
+      description: Get owner feed
+      operationId: getUserFeed
+      parameters:
+        - name: username
+          in: path
+          required: true
+          schema:
+            type: string
+        - name: size
+          in: query
+          schema:
+            type: integer
+        - name: page
+          in: query
+          schema:
+            type: integer
+      responses:
+        200:
+          description: Feed retrieved
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/PagePost'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /posts:
+    post:
+      tags:
+        - Post Controller
+      description: Add new post
+      operationId: publishPost
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        201:
+          description: Post created successfully
+        400:
+          description: Request not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /posts/{id}:
+    put:
+      tags:
+        - Post Controller
+      description: Update post content
+      operationId: updatePost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: false
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/PostRequest'
+      responses:
+        200:
+          description: Post updated successfully
+        400:
+          description: Request not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Post Controller
+      description: Delete post
+      operationId: deletePost
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        204:
+          description: Post deleted successfully
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        400:
+          description: Request not valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+  /reactions/like:
+    post:
+      tags:
+        - Reactions Controller
+      description: Add like to post
+      operationId: addLike
+      parameters:
+        - name: postId
+          in: query
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        201:
+          description: Like added
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+    delete:
+      tags:
+        - Reactions Controller
+      description: Remove like from post
+      operationId: removeLike
+      parameters:
+        - name: postId
+          in: query
+          required: true
+          schema:
+            type: string
+            nullable: false
+      responses:
+        204:
+          description: Like removed
+        404:
+          description: Post not found
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+        500:
+          description: Internal server error
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ErrorResponse'
+
+components:
+  schemas:
+    ErrorResponse:
+      type: object
+      properties:
+        message:
+          type: string
+        timestamp:
+          type: integer
+    CommentRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 3
+          maxLength: 300
+          nullable: false
+    CommentResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: false
+        authorId:
+          type: string
+          nullable: false
+        content:
+          type: string
+          minLength: 3
+          maxLength: 300
+          nullable: false
+        created:
+          type: string
+          format: date
+          nullable: false
+        updated:
+          type: string
+          format: date
+          nullable: false
+    PostRequest:
+      type: object
+      properties:
+        content:
+          type: string
+          minLength: 3
+          maxLength: 300
+          nullable: false
+    PostResponse:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: false
+        authorId:
+          type: string
+          nullable: false
+        content:
+          type: string
+          nullable: false
+        likes:
+          type: array
+          items:
+            $ref: '#/components/schemas/UserInfo'
+        comments:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+        created:
+          type: string
+          format: date
+          nullable: false
+        updated:
+          type: string
+          format: date
+          nullable: false
+    UserRegistration:
+      type: object
+      properties:
+        username:
+          type: string
+          minLength: 3
+          maxLength: 20
+          nullable: false
+        email:
+          type: string
+          format: email
+          pattern: '^[\w.-]+@[\w.-]+\.\w+$'
+          nullable: false
+        password:
+          type: string
+          pattern: '^(?=.*[0-9])(?=.*[a-z])(?=.*[A-Z]).{8,20}$'
+          nullable: false
+    UserInfo:
+      type: object
+      properties:
+        id:
+          type: string
+          nullable: false
+        username:
+          type: string
+          nullable: false
+    PagePost:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        last:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/PostResponse'
+        number:
+          type: integer
+          format: int32
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    PageComments:
+      type: object
+      properties:
+        totalPages:
+          type: integer
+          format: int32
+        totalElements:
+          type: integer
+          format: int64
+        first:
+          type: boolean
+        pageable:
+          $ref: '#/components/schemas/Pageable'
+        last:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        size:
+          type: integer
+          format: int32
+        content:
+          type: array
+          items:
+            $ref: '#/components/schemas/CommentResponse'
+        number:
+          type: integer
+          format: int32
+        numberOfElements:
+          type: integer
+          format: int32
+        empty:
+          type: boolean
+    Pageable:
+      type: object
+      properties:
+        pageNumber:
+          type: integer
+          format: int32
+        pageSize:
+          type: integer
+          format: int32
+        paged:
+          type: boolean
+        unpaged:
+          type: boolean
+        sort:
+          $ref: '#/components/schemas/Sort'
+        offset:
+          type: integer
+          format: int64
+    Sort:
+      type: object
+      properties:
+        sorted:
+          type: boolean
+        unsorted:
+          type: boolean
+        empty:
+          type: boolean

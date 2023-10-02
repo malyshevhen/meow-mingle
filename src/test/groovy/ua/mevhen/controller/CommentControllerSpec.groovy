@@ -9,7 +9,7 @@ import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
-import ua.mevhen.domain.dto.CommentRequest
+import ua.mevhen.dto.CommentRequest
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.service.CommentService
 
@@ -20,8 +20,8 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @AutoConfigureMockMvc
 class CommentControllerSpec extends Specification {
 
-    private static final USER_NOT_FOUND_EXCEPTION
-        = new UserNotFoundException('PostNotFoundException')
+    private static final USER_NOT_FOUND_EXCEPTION = new UserNotFoundException('PostNotFoundException')
+    private static final COMMENTS_URL = "/api/posts/comments"
 
     @Autowired
     MockMvc mockMvc
@@ -94,7 +94,8 @@ class CommentControllerSpec extends Specification {
 
     private def performPost(String postId, CommentRequest commentRequest) {
         mockMvc.perform(
-            post("/api/posts/comment/{postId}", postId)
+            post(COMMENTS_URL)
+                .param('postId', postId)
                 .content(objectMapper.writeValueAsString(commentRequest))
                 .contentType("application/json"))
             .andReturn()
@@ -102,14 +103,15 @@ class CommentControllerSpec extends Specification {
 
     private def performPut(String commentId, CommentRequest commentRequest) {
         mockMvc.perform(
-            put("/api/posts/comment/$commentId")
+            put(COMMENTS_URL)
+                .param('commentId', commentId)
                 .content(objectMapper.writeValueAsString(commentRequest))
                 .contentType("application/json"))
             .andReturn()
     }
 
     private def performDelete(String commentId) {
-        mockMvc.perform(delete("/api/posts/comment/{commentId}", commentId))
+        mockMvc.perform(delete(COMMENTS_URL).param('commentId', commentId))
             .andReturn()
     }
 

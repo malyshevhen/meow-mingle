@@ -7,8 +7,8 @@ import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMock
 import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
-import ua.mevhen.domain.dto.UserInfo
-import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.dto.UserInfo
+import ua.mevhen.dto.UserRegistration
 import ua.mevhen.service.UserService
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
@@ -18,6 +18,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 @SpringBootTest(webEnvironment = MOCK)
 @AutoConfigureMockMvc
 class RegistrationControllerSpec extends Specification {
+
+    private static final USER_REGISTRATION_URL = '/api/users/registration'
 
     @Autowired
     MockMvc mockMvc
@@ -39,7 +41,7 @@ class RegistrationControllerSpec extends Specification {
 
         when: 'Perform registration'
         userService.save(validRegistration) >> new UserInfo(id: "1", username: "testUser")
-        def result = mockMvc.perform(post('/api/user/register')
+        def result = mockMvc.perform(post(USER_REGISTRATION_URL)
             .contentType('application/json')
             .content(mapper.writeValueAsString(validRegistration)))
 
@@ -56,12 +58,11 @@ class RegistrationControllerSpec extends Specification {
         )
 
         when: 'Perform registration'
-        def result = mockMvc.perform(post('/api/user/register')
+        def result = mockMvc.perform(post(USER_REGISTRATION_URL)
             .contentType('application/json')
             .content(mapper.writeValueAsString(invalidRegistration)))
 
         then: 'Expect: status is 400'
         result.andExpect(status().isBadRequest())
     }
-
 }

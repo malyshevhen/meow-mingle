@@ -1,9 +1,9 @@
 package ua.mevhen.mapper
 
 import org.springframework.stereotype.Component
+import ua.mevhen.domain.model.User
 import ua.mevhen.dto.UserInfo
 import ua.mevhen.dto.UserRegistration
-import ua.mevhen.domain.model.User
 
 @Component
 class UserMapper {

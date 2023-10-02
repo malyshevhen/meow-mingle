@@ -1,7 +1,6 @@
 package ua.mevhen.controller
 
 import groovy.util.logging.Slf4j
-import jakarta.validation.Valid
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize

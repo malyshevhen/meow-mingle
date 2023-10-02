@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import ua.mevhen.dto.PostResponse
-import ua.mevhen.domain.model.User
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.mapper.PostMapper
 import ua.mevhen.repository.PostRepository

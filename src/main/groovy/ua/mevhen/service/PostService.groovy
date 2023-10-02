@@ -1,8 +1,8 @@
 package ua.mevhen.service
 
-import ua.mevhen.dto.PostResponse
 import ua.mevhen.domain.model.Post
 import ua.mevhen.dto.PostRequest
+import ua.mevhen.dto.PostResponse
 
 interface PostService {
 

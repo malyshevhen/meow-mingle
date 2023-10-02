@@ -1,8 +1,8 @@
 package ua.mevhen.service
 
+import ua.mevhen.domain.model.User
 import ua.mevhen.dto.UserInfo
 import ua.mevhen.dto.UserRegistration
-import ua.mevhen.domain.model.User
 
 interface UserService {
 

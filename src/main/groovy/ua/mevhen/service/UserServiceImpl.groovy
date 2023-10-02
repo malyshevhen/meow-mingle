@@ -4,10 +4,10 @@ import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ua.mevhen.dto.UserInfo
-import ua.mevhen.dto.UserRegistration
 import ua.mevhen.domain.model.Role
 import ua.mevhen.domain.model.User
+import ua.mevhen.dto.UserInfo
+import ua.mevhen.dto.UserRegistration
 import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.mapper.UserMapper

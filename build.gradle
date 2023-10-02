@@ -10,6 +10,13 @@ version = '0.0.1-SNAPSHOT'
 
 java {
     sourceCompatibility = '17'
+    sourceCompatibility = '17'
+}
+
+configurations {
+    compileOnly {
+        extendsFrom annotationProcessor
+    }
 }
 
 configurations {
@@ -31,6 +38,7 @@ sourceSets {
     }
 }
 
+
 dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-security'
     implementation 'org.springframework.boot:spring-boot-starter-validation'
@@ -50,6 +58,7 @@ dependencies {
 }
 
 tasks.named('test') {
+    useJUnitPlatform()
     useJUnitPlatform()
 }
 

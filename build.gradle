@@ -75,11 +75,3 @@ openApiGenerate {
         useSpringBoot3: 'true'
     ]
 }
-
-tasks.register('publishSampleClientToMavenLocal', Exec) {
-    logger.isEnabled(LogLevel.INFO)
-    environment ['JAVA_HOME', '/home/evhen/.sdkman/candidates/java/current']
-    dependsOn openApiGenerate
-    commandLine './publish_library_to_mavan_local.sh'
-    ignoreExitValue true
-}

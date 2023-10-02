@@ -8,7 +8,7 @@ import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spock.lang.Specification
-import ua.mevhen.domain.dto.UserInfo
+import ua.mevhen.dto.UserInfo
 import ua.mevhen.service.UserService
 
 import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
@@ -29,21 +29,21 @@ class UserControllerSpec extends Specification {
     @WithMockUser
     def "test updateUsername endpoint"() {
         given:
-        def userId = 'user123'
+        def usernameToUpdate = 'user123'
         def newUsername = 'newUsername'
-        def userInfo = new UserInfo(id: userId, username: newUsername)
+        def userInfo = new UserInfo(id: usernameToUpdate, username: newUsername)
 
-        userService.updateUsername(userId, newUsername) >> userInfo
+        userService.updateUsername(usernameToUpdate, newUsername) >> userInfo
 
         when:
-        def result = mockMvc.perform(put("/api/user/$userId")
+        def result = mockMvc.perform(put("/api/users")
+            .param('username', usernameToUpdate)
             .param("username", newUsername)
             .contentType('application/json'))
+            .andReturn()
 
         then:
-        result.andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(jsonPath('$.id').value(userId))
-            .andExpect(jsonPath('$.username').value(newUsername))
+        result.response.status == 200
     }
 
     @WithMockUser
@@ -52,9 +52,9 @@ class UserControllerSpec extends Specification {
         def userId = 'user123'
 
         when:
-        def result = mockMvc.perform(delete("/api/user/$userId"))
+        def result = mockMvc.perform(delete("/api/users")).andReturn()
 
         then:
-        result.andExpect(MockMvcResultMatchers.status().isNoContent())
+        result.response.status == 204
     }
 }

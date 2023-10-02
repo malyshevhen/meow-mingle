@@ -2,10 +2,10 @@ package ua.mevhen.service
 
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.data.domain.PageRequest
-import ua.mevhen.domain.dto.PostRequest
-import ua.mevhen.domain.dto.PostResponse
-import ua.mevhen.domain.dto.UserInfo
-import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.dto.PostRequest
+import ua.mevhen.dto.PostResponse
+import ua.mevhen.dto.UserInfo
+import ua.mevhen.dto.UserRegistration
 import ua.mevhen.service.subscription.SubscriptionService
 
 class FeedServiceIntegrationSpec extends AbstractIntegrationSpec {

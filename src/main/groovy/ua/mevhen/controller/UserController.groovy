@@ -1,57 +1,93 @@
 package ua.mevhen.controller
 
 import groovy.util.logging.Slf4j
-import io.swagger.v3.oas.annotations.Operation
-import io.swagger.v3.oas.annotations.Parameter
-import io.swagger.v3.oas.annotations.tags.Tag
-import jakarta.validation.constraints.NotBlank
-import org.springframework.http.HttpStatus
+import jakarta.validation.Valid
+import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.web.bind.annotation.*
-import ua.mevhen.domain.dto.UserInfo
+import org.springframework.security.core.context.SecurityContextHolder
+import org.springframework.web.bind.annotation.RequestMapping
+import org.springframework.web.bind.annotation.RestController
+import ua.mevhen.api.UsersApi
+import ua.mevhen.config.properties.SubscriptionServiceProperties
+import ua.mevhen.domain.events.Subscription
+import ua.mevhen.dto.UserRegistration
 import ua.mevhen.service.UserService
 
-@Tag(name = 'UserController', description = 'Operations related to user management')
-@RestController
-@RequestMapping('/api/user')
+import static ua.mevhen.domain.events.SubscriptionOperation.SUBSCRIBE
+import static ua.mevhen.domain.events.SubscriptionOperation.UNSUBSCRIBE
+
 @Slf4j
-class UserController {
+@RestController
+@RequestMapping('/api')
+class UserController implements UsersApi {
 
     private final UserService userService
+    private final RedisTemplate<String, Subscription> redisSubscriptionTemplate
+    private final SubscriptionServiceProperties properties
 
-    UserController(UserService userService) {
+    UserController(
+        UserService userService,
+        RedisTemplate<String, Subscription> redisSubscriptionTemplate,
+        SubscriptionServiceProperties properties
+    ) {
         this.userService = userService
+        this.redisSubscriptionTemplate = redisSubscriptionTemplate
+        this.properties = properties
     }
 
+    @Override
+    ResponseEntity<Void> register(UserRegistration regForm) {
+        log.info("Received a registration request for username: ${ regForm.getUsername() }")
+        userService.save(regForm)
+        log.info("User registered successfully with username: ${ regForm.getUsername() }")
+        return ResponseEntity.status(201).build()
+    }
+
+    @Override
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(
-        summary = 'Update user username',
-        description = 'Update the username of a user by providing their user ID and a new username.',
-        tags = ['UserController']
-    )
-    @PutMapping('/{id}')
-    UserInfo updateUsername(
-        @PathVariable('id') @Parameter(description = 'User ID') @NotBlank String userId,
-        @RequestParam('username') @Parameter(description = 'Username') @NotBlank String username
-    ) {
-        def updatedUserInfo = userService.updateUsername(userId, username)
-        log.info("User ID ${ userId } updated username to ${ username }")
-        return updatedUserInfo
+    ResponseEntity<Void> updateUsername(String username) {
+        def authentication = SecurityContextHolder.context.authentication
+        def usernameToUpdate = authentication.name
+        userService.updateUsername(usernameToUpdate, username)
+        log.info("User '$usernameToUpdate' update username to '$username'")
+        return ResponseEntity.status(200).build()
     }
 
+    @Override
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(
-        summary = 'Delete user by ID',
-        description = 'Delete a user by providing their user ID.',
-        tags = ['UserController']
-    )
-    @DeleteMapping('/{id}')
-    @ResponseStatus(HttpStatus.NO_CONTENT)
-    void delete(
-        @PathVariable('id') @Parameter(description = 'User ID') @NotBlank String userId
-    ) {
-        userService.deleteById(userId)
-        log.info("User ID ${ userId } deleted")
+    ResponseEntity<Void> deleteUser() {
+        def authentication = SecurityContextHolder.context.authentication
+        def username = authentication.name
+        userService.deleteByUsername(username)
+        log.info("User '$username' deleted")
+        return ResponseEntity.status(204).build()
     }
 
+    @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
+    ResponseEntity<Void> subscribe(String userId) {
+        def authentication = SecurityContextHolder.context.authentication
+        def username = authentication.name
+        def subscription = new Subscription(username, userId, SUBSCRIBE)
+        log.info("User '$username' request for subscription to '$userId'")
+
+        redisSubscriptionTemplate.opsForList().leftPush(properties.keyName, subscription)
+
+        return ResponseEntity.status(200).build()
+    }
+
+    @Override
+    @PreAuthorize("hasRole('ROLE_USER')")
+    ResponseEntity<Void> unsubscribe(String userId) {
+        def authentication = SecurityContextHolder.context.authentication
+        def username = authentication.name
+
+        def subscription = new Subscription(username, userId, UNSUBSCRIBE)
+        log.info("User '$username' request to unsubscribe from user '$userId'")
+
+        redisSubscriptionTemplate.opsForList().leftPush('subscription-events', subscription)
+
+        return ResponseEntity.status(200).build()
+    }
 }

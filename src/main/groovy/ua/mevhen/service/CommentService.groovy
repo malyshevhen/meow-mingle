@@ -2,8 +2,8 @@ package ua.mevhen.service
 
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
-import ua.mevhen.domain.dto.CommentRequest
-import ua.mevhen.domain.dto.CommentResponse
+import ua.mevhen.dto.CommentRequest
+import ua.mevhen.dto.CommentResponse
 
 interface CommentService {
 

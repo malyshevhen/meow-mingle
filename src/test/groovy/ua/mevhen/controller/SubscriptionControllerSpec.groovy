@@ -11,6 +11,7 @@ import ua.mevhen.domain.model.User
 import ua.mevhen.service.AbstractIntegrationSpec
 import ua.mevhen.service.UserService
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
@@ -18,7 +19,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 class SubscriptionControllerSpec extends AbstractIntegrationSpec {
 
     private static USERNAME = 'John'
-    public static final SUB_ID = new ObjectId().toString()
+    private static final SUB_ID = new ObjectId().toString()
+    private static final SUBSCRIPTIONS_URL = "/api/users/subscriptions"
 
     @Autowired
     MockMvc mockMvc
@@ -30,7 +32,8 @@ class SubscriptionControllerSpec extends AbstractIntegrationSpec {
     @WithMockUser(username = 'John')
     def "test subscribe to another user"() {
         when:
-        def result = mockMvc.perform(post("/api/user/subscribe/${ SUB_ID }"))
+        def result = mockMvc.perform(post(SUBSCRIPTIONS_URL)
+            .param('userId', SUB_ID))
         userService.findByUsername(USERNAME) >> new User()
         Thread.sleep(100)
 
@@ -44,7 +47,8 @@ class SubscriptionControllerSpec extends AbstractIntegrationSpec {
     @WithMockUser(username = 'John')
     def "test unsubscribe from another user"() {
         when:
-        def result = mockMvc.perform(post("/api/user/unsubscribe/${ SUB_ID }"))
+        def result = mockMvc.perform(delete(SUBSCRIPTIONS_URL)
+            .param('userId', SUB_ID))
         userService.findByUsername(USERNAME) >> new User()
         Thread.sleep(100)
 

@@ -2,9 +2,10 @@ package ua.mevhen.service
 
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
-import ua.mevhen.domain.dto.PostRequest
-import ua.mevhen.domain.dto.UserInfo
-import ua.mevhen.domain.dto.UserRegistration
+import spock.lang.Shared
+import ua.mevhen.dto.PostRequest
+import ua.mevhen.dto.UserInfo
+import ua.mevhen.dto.UserRegistration
 import ua.mevhen.domain.model.Post
 import ua.mevhen.exceptions.PermissionDeniedException
 import ua.mevhen.exceptions.PostNotFoundException
@@ -17,6 +18,7 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
     @Autowired
     UserService userService
 
+    @Shared
     List<UserInfo> userInfos
 
     def setup() {
@@ -38,10 +40,6 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
         userInfos = users.collect { userService.save(it) }
     }
 
-    def cleanup() {
-        userInfos.each { userService.deleteById(it.id) }
-    }
-
     def "test save method"() {
         given:
         def username = 'John Doe'
@@ -58,6 +56,7 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         cleanup:
         postService.delete(savedPostResponse.id, username)
+        userInfos.each { userService.deleteById(it.id) }
     }
 
     def "test update method with valid authorization"() {
@@ -72,6 +71,9 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         updatedPostResponse.content == postRequest.content
+
+        cleanup:
+        userInfos.each { userService.deleteById(it.id) }
     }
 
     def "test update method with invalid post id"() {
@@ -85,6 +87,9 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         thrown(PostNotFoundException)
+
+        cleanup:
+        userInfos.each { userService.deleteById(it.id) }
     }
 
     def "test delete method with valid authorization"() {
@@ -105,6 +110,9 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         thrown PostNotFoundException
+
+        cleanup:
+        userInfos.each { userService.deleteById(it.id) }
     }
 
     def "test delete method with invalid authorization"() {
@@ -118,6 +126,9 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         thrown(PermissionDeniedException)
+
+        cleanup:
+        userInfos.each { userService.deleteById(it.id) }
     }
 
     def "test like and unlike operations"() {
@@ -149,6 +160,9 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         then:
         !post.likes.contains(user)
+
+        cleanup:
+        userInfos.each { userService.deleteById(it.id) }
     }
 
     def "test updateComments method with valid post"() {
@@ -167,6 +181,7 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         cleanup:
         postService.delete(postResponse.id, username)
+        userInfos.each { userService.deleteById(it.id) }
     }
 
     def "test updateComments method with invalid post"() {
@@ -186,6 +201,7 @@ class PostServiceIntegrationSpec extends AbstractIntegrationSpec {
 
         cleanup:
         postService.delete(postResponse.id, username)
+        userInfos.each { userService.deleteById(it.id) }
     }
 
 }

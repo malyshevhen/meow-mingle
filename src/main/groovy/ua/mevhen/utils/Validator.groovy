@@ -1,6 +1,6 @@
 package ua.mevhen.utils
 
-import ua.mevhen.domain.dto.CommentRequest
+import ua.mevhen.dto.CommentRequest
 
 class Validator {
 

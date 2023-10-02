@@ -2,7 +2,7 @@ package ua.mevhen.service
 
 import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
-import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.dto.UserRegistration
 import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.repository.UserRepository
@@ -36,7 +36,7 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
         def user = userRepository.findById(id).get()
 
         then:
-        user.role == 'USER'
+        user.role == 'ROLE_USER'
         user.created != null
 
         when:
@@ -61,9 +61,9 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
 
 
         when:
-        def id = savedUserInfo.id
+        def username = savedUserInfo.username
         def newUsername = "newUsername"
-        def updatedUserInfo = userService.updateUsername(id, newUsername)
+        def updatedUserInfo = userService.updateUsername(username, newUsername)
 
         then:
         updatedUserInfo.username == newUsername

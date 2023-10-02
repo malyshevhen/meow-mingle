@@ -36,7 +36,7 @@ class SecurityConfig {
                 it.requestMatchers(
                     '/v3/api-docs/**',
                     '/swagger-ui/**',
-                    '/api/user/register').permitAll()
+                    '/api/users/registration').permitAll()
                 it.anyRequest().authenticated()
             }
             .userDetailsService(userSecurityService)

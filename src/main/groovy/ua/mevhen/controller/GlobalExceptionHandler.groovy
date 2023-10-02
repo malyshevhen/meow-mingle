@@ -15,8 +15,8 @@ import ua.mevhen.exceptions.PostNotFoundException
 import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
 
-@RestControllerAdvice
 @Slf4j
+@RestControllerAdvice
 class GlobalExceptionHandler extends ResponseEntityExceptionHandler {
 
     @ExceptionHandler([

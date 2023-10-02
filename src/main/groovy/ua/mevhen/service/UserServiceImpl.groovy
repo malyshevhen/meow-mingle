@@ -4,8 +4,8 @@ import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
-import ua.mevhen.domain.dto.UserInfo
-import ua.mevhen.domain.dto.UserRegistration
+import ua.mevhen.dto.UserInfo
+import ua.mevhen.dto.UserRegistration
 import ua.mevhen.domain.model.Role
 import ua.mevhen.domain.model.User
 import ua.mevhen.exceptions.UserAlreadyExistsException
@@ -56,8 +56,8 @@ class UserServiceImpl implements UserService {
 
     @Override
     @Transactional
-    UserInfo updateUsername(String id, String username) {
-        def user = findById(id)
+    UserInfo updateUsername(String usernameToUpdate, String username) {
+        def user = findByUsername(usernameToUpdate)
         user.username = username
         def updatedUser = userRepository.save(user)
         log.info("Updated username for user with ID: ${ updatedUser.id } to: $username")
@@ -70,6 +70,15 @@ class UserServiceImpl implements UserService {
         def user = findById(id)
         userRepository.delete(user)
         log.info("Deleted user with ID: $id")
+    }
+
+    @Override
+    @Transactional
+    void deleteByUsername(String username) {
+        def user = userRepository.findByUsername(username)
+            .orElseThrow { new UserNotFoundException("User $username not found") }
+        userRepository.delete(user)
+        log.info("Deleted user: $username")
     }
 
     @Override

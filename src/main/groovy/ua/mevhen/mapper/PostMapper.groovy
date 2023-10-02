@@ -1,9 +1,9 @@
 package ua.mevhen.mapper
 
 import org.springframework.stereotype.Component
-import ua.mevhen.domain.dto.PostRequest
-import ua.mevhen.domain.dto.PostResponse
+import ua.mevhen.dto.PostResponse
 import ua.mevhen.domain.model.Post
+import ua.mevhen.dto.PostRequest
 
 @Component
 class PostMapper {

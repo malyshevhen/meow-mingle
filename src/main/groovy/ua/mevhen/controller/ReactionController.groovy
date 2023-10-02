@@ -21,10 +21,9 @@ import java.security.Principal
 import static ua.mevhen.domain.events.ReactionOperation.LIKE
 import static ua.mevhen.domain.events.ReactionOperation.UNLIKE
 
-@Tag(name = 'ReactionController', description = 'Operations related to user reactions')
+@Slf4j
 @RestController
 @RequestMapping('/api/reactions')
-@Slf4j
 class ReactionController {
 
     private final RedisTemplate<String, Reaction> redisReactionTemplate
@@ -39,11 +38,6 @@ class ReactionController {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(
-        summary = 'Add a like reaction to a post',
-        description = 'Add a like reaction to a post for the authenticated user.',
-        tags = ['ReactionController']
-    )
     @PostMapping('/like')
     void addReaction(
         Principal principal,
@@ -55,11 +49,6 @@ class ReactionController {
     }
 
     @PreAuthorize("hasRole('ROLE_USER')")
-    @Operation(
-        summary = 'Remove a like reaction from a post',
-        description = 'Remove a like reaction from a post for the authenticated user.',
-        tags = ['ReactionController']
-    )
     @DeleteMapping('/like')
     void removeReaction(
         Principal principal,
@@ -69,5 +58,4 @@ class ReactionController {
         log.info("User: '${ principal.name }' request to remove like from post: '$postId'.")
         redisReactionTemplate.opsForList().leftPush(properties.keyName, reaction)
     }
-
 }

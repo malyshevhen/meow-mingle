@@ -4,7 +4,6 @@ import groovy.util.logging.Slf4j
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
-import org.springframework.security.core.context.SecurityContextHolder
 import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RestController
 import ua.mevhen.api.UsersApi
@@ -13,6 +12,7 @@ import ua.mevhen.domain.events.Subscription
 import ua.mevhen.dto.UserRegistration
 import ua.mevhen.service.UserService
 
+import static ua.mevhen.controller.AuthHelper.authenticatedUsername
 import static ua.mevhen.domain.events.SubscriptionOperation.SUBSCRIBE
 import static ua.mevhen.domain.events.SubscriptionOperation.UNSUBSCRIBE
 
@@ -46,8 +46,7 @@ class UserController implements UsersApi {
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> updateUsername(String username) {
-        def authentication = SecurityContextHolder.context.authentication
-        def usernameToUpdate = authentication.name
+        def usernameToUpdate = authenticatedUsername()
         userService.updateUsername(usernameToUpdate, username)
         log.info("User '$usernameToUpdate' update username to '$username'")
         return ResponseEntity.status(200).build()
@@ -56,8 +55,7 @@ class UserController implements UsersApi {
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> deleteUser() {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = authenticatedUsername()
         userService.deleteByUsername(username)
         log.info("User '$username' deleted")
         return ResponseEntity.status(204).build()
@@ -66,8 +64,7 @@ class UserController implements UsersApi {
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> subscribe(String userId) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = authenticatedUsername()
         def subscription = new Subscription(username, userId, SUBSCRIBE)
         log.info("User '$username' request for subscription to '$userId'")
 
@@ -79,8 +76,7 @@ class UserController implements UsersApi {
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> unsubscribe(String userId) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = authenticatedUsername()
 
         def subscription = new Subscription(username, userId, UNSUBSCRIBE)
         log.info("User '$username' request to unsubscribe from user '$userId'")

@@ -5,7 +5,6 @@ import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
 import org.springframework.stereotype.Service
 import ua.mevhen.domain.dto.PostResponse
-import ua.mevhen.domain.model.User
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.mapper.PostMapper
 import ua.mevhen.repository.PostRepository
@@ -37,7 +36,7 @@ class FeedServiceImpl implements FeedService {
         }
         def user = userService.findByUsername(username)
         def subscriptionIds = user.subscriptions.collect {it.id}
-        def pageOfPosts = postRepository.findAllByAuthorsId(subscriptionIds, pageable)
+        def pageOfPosts = postRepository.findAllByAuthorIdIn(subscriptionIds, pageable)
         log.info("Retrieve feed for user: '$username'.")
         return pageOfPosts.map(postMapper::toResponse)
     }

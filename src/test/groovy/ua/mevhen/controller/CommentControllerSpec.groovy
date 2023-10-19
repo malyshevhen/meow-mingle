@@ -88,8 +88,8 @@ class CommentControllerSpec extends Specification {
         result.response.status == httpStatus
 
         where:
-        exception                      | httpStatus
-        USER_NOT_FOUND_EXCEPTION       | 404
+        exception                | httpStatus
+        USER_NOT_FOUND_EXCEPTION | 404
     }
 
     private def performPost(String postId, CommentRequest commentRequest) {

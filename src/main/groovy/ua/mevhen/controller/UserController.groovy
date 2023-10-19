@@ -47,12 +47,12 @@ class UserController implements UsersApi {
 
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
-    ResponseEntity<Void> updateUsername(String username) {
+    ResponseEntity<UserInfo> updateUsername(String username) {
         def authentication = SecurityContextHolder.context.authentication
         def usernameToUpdate = authentication.name
-        userService.updateUsername(usernameToUpdate, username)
+        def userInfo = userService.updateUsername(usernameToUpdate, username)
         log.info("User '$usernameToUpdate' update username to '$username'")
-        return ResponseEntity.status(200).build()
+        return new ResponseEntity<>(userInfo, HttpStatus.OK)
     }
 
     @Override

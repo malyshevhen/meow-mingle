@@ -29,6 +29,10 @@ paths:
       responses:
         201:
           description: User registered
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
         400:
           description: Request not valid
           content:
@@ -109,6 +113,10 @@ paths:
       responses:
         200:
           description: Username updated successfully
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/UserInfo'
         400:
           description: Username not valid
           content:
@@ -140,7 +148,6 @@ paths:
             application/json:
               schema:
                 $ref: '#/components/schemas/ErrorResponse'
-
   /posts/comments:
     post:
       tags:

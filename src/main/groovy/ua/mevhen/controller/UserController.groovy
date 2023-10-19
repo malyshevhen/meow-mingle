@@ -1,8 +1,8 @@
 package ua.mevhen.controller
 
 import groovy.util.logging.Slf4j
-import jakarta.validation.Valid
 import org.springframework.data.redis.core.RedisTemplate
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RestController
 import ua.mevhen.api.UsersApi
 import ua.mevhen.config.properties.SubscriptionServiceProperties
 import ua.mevhen.domain.events.Subscription
+import ua.mevhen.dto.UserInfo
 import ua.mevhen.dto.UserRegistration
 import ua.mevhen.service.UserService
 
@@ -37,11 +38,11 @@ class UserController implements UsersApi {
     }
 
     @Override
-    ResponseEntity<Void> register(UserRegistration regForm) {
+    ResponseEntity<UserInfo> register(UserRegistration regForm) {
         log.info("Received a registration request for username: ${ regForm.getUsername() }")
-        userService.save(regForm)
+        def userInfo = userService.save(regForm)
         log.info("User registered successfully with username: ${ regForm.getUsername() }")
-        return ResponseEntity.status(201).build()
+        return new ResponseEntity<>(userInfo, HttpStatus.CREATED)
     }
 
     @Override

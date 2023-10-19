@@ -28,25 +28,19 @@ class FeedController implements FeedApi {
     @Override
     ResponseEntity<PagePost> getOwnFeed(Integer size, Integer page) {
         log.info("Request to receive the owner's feed.")
-
         def username = SecurityContextHolder.context.authentication.name
         def pageable = Pageable.ofSize(size).withPage(page)
-        def feedPage = pagePostMapper.toPagePost(feedService.getFeed(username, pageable))
-
+        def feedPage = feedService.getFeed(username, pageable)
         log.info("Page $page of size $size of Posts for user: $username is retrieved.")
-
-        return new ResponseEntity<>(feedPage, HttpStatus.OK)
+        return new ResponseEntity(feedPage, HttpStatus.OK)
     }
 
     @Override
     ResponseEntity<PagePost> getUserFeed(String username, Integer size, Integer page) {
         log.info("Request to receive '$username' user's feed with")
-
         def pageable = Pageable.ofSize(size).withPage(page)
-        def feedPage = pagePostMapper.toPagePost(feedService.getFeed(username, pageable))
-
+        def feedPage = feedService.getFeed(username, pageable)
         log.info("Page $page of size $size of Posts for user: $username is retrieved.")
-
-        return new ResponseEntity<>(feedPage, HttpStatus.OK)
+        return new ResponseEntity(feedPage, HttpStatus.OK)
     }
 }

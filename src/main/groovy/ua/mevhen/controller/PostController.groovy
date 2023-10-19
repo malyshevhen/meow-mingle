@@ -2,6 +2,7 @@ package ua.mevhen.controller
 
 import groovy.util.logging.Slf4j
 import org.springframework.data.domain.PageRequest
+import org.springframework.http.HttpStatus
 import org.springframework.http.ResponseEntity
 import org.springframework.security.access.prepost.PreAuthorize
 import org.springframework.security.core.context.SecurityContextHolder
@@ -30,44 +31,36 @@ class PostController implements PostsApi {
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> publishPost(PostRequest postRequest) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = SecurityContextHolder.context.authentication.name
         log.info("User '$username' is posting a new post")
         postService.save(username, postRequest)
-
         return ResponseEntity.status(201).build()
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> updatePost(String id, PostRequest request) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = SecurityContextHolder.context.authentication.name
         log.info("User '$username' is updating post with ID: $id")
         postService.update(id, request, username)
-
         return ResponseEntity.ok().build()
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> deletePost(String id) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = SecurityContextHolder.context.authentication.name
         log.info("User '$username' is deleting post with ID: $id")
         postService.delete(id, username)
-
         return ResponseEntity.status(204).build()
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> addComment(String postId, CommentRequest request) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = SecurityContextHolder.context.authentication.name
         log.info("Request to comment post with ID: $postId by user: $username")
         commentService.save(username, postId, request)
-
         return ResponseEntity.status(201).build()
     }
 
@@ -75,34 +68,26 @@ class PostController implements PostsApi {
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<PageComments> getPostComments(String postId, Integer size, Integer page) {
         log.info("Request to retrieve posts comments with PostID: $postId")
-
         def pageable = PageRequest.of(page, size)
         def postComments = commentService.getByPostId(postId, pageable)
-
-        return ResponseEntity.of(Optional.ofNullable(postComments))
-            .status(200)
-            .build()
+        return new ResponseEntity(postComments, HttpStatus.OK)
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> updateComment(String commentId, CommentRequest request) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = SecurityContextHolder.context.authentication.name
         log.info("Request to update comment with ID: $commentId by user: $username")
         commentService.update(username, commentId, request)
-
         return ResponseEntity.status(200).build()
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> deleteCommentById(String commentId) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = SecurityContextHolder.context.authentication.name
         log.info("Request to delete comment with ID: $commentId by user: $username")
         commentService.delete(username, commentId)
-
         return ResponseEntity.status(204).build()
     }
 }

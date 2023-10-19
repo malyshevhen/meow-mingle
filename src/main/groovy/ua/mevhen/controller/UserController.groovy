@@ -42,7 +42,7 @@ class UserController implements UsersApi {
         log.info("Received a registration request for username: ${ regForm.getUsername() }")
         def userInfo = userService.save(regForm)
         log.info("User registered successfully with username: ${ regForm.getUsername() }")
-        return new ResponseEntity<>(userInfo, HttpStatus.CREATED)
+        return new ResponseEntity(userInfo, HttpStatus.CREATED)
     }
 
     @Override
@@ -52,14 +52,13 @@ class UserController implements UsersApi {
         def usernameToUpdate = authentication.name
         def userInfo = userService.updateUsername(usernameToUpdate, username)
         log.info("User '$usernameToUpdate' update username to '$username'")
-        return new ResponseEntity<>(userInfo, HttpStatus.OK)
+        return new ResponseEntity(userInfo, HttpStatus.OK)
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> deleteUser() {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = SecurityContextHolder.context.authentication.name
         userService.deleteByUsername(username)
         log.info("User '$username' deleted")
         return ResponseEntity.status(204).build()
@@ -68,27 +67,20 @@ class UserController implements UsersApi {
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> subscribe(String userId) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
+        def username = SecurityContextHolder.context.authentication.name
         def subscription = new Subscription(username, userId, SUBSCRIBE)
         log.info("User '$username' request for subscription to '$userId'")
-
         redisSubscriptionTemplate.opsForList().leftPush(properties.keyName, subscription)
-
         return ResponseEntity.status(200).build()
     }
 
     @Override
     @PreAuthorize("hasRole('ROLE_USER')")
     ResponseEntity<Void> unsubscribe(String userId) {
-        def authentication = SecurityContextHolder.context.authentication
-        def username = authentication.name
-
+        def username = SecurityContextHolder.context.authentication.name
         def subscription = new Subscription(username, userId, UNSUBSCRIBE)
         log.info("User '$username' request to unsubscribe from user '$userId'")
-
         redisSubscriptionTemplate.opsForList().leftPush('subscription-events', subscription)
-
         return ResponseEntity.status(200).build()
     }
 }

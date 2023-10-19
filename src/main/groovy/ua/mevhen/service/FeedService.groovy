@@ -1,11 +1,11 @@
 package ua.mevhen.service
 
-import org.springframework.data.domain.Page
+
 import org.springframework.data.domain.Pageable
-import ua.mevhen.dto.PostResponse
+import ua.mevhen.dto.PagePost
 
 interface FeedService {
 
-    Page<PostResponse> getFeed(String username, Pageable pageable)
+    PagePost getFeed(String username, Pageable pageable)
 
 }

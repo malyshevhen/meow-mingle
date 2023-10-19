@@ -46,7 +46,7 @@ class UserController implements UsersApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<UserInfo> updateUsername(String username) {
         def authentication = SecurityContextHolder.context.authentication
         def usernameToUpdate = authentication.name
@@ -56,7 +56,7 @@ class UserController implements UsersApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> deleteUser() {
         def username = SecurityContextHolder.context.authentication.name
         userService.deleteByUsername(username)
@@ -65,7 +65,7 @@ class UserController implements UsersApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> subscribe(String userId) {
         def username = SecurityContextHolder.context.authentication.name
         def subscription = new Subscription(username, userId, SUBSCRIBE)
@@ -75,7 +75,7 @@ class UserController implements UsersApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> unsubscribe(String userId) {
         def username = SecurityContextHolder.context.authentication.name
         def subscription = new Subscription(username, userId, UNSUBSCRIBE)

@@ -13,7 +13,7 @@ import org.springframework.context.annotation.Configuration
     name = "basicAuth",
     scheme = "basic")
 @OpenAPIDefinition(
-    info = @Info(title = "Meow Mingle API", version = "v1"),
+    info = @Info(title = "Meow Mingle API", version = "0.0.1"),
     security = @SecurityRequirement(name = "basicAuth")
 )
 class SpringDocConfig {}

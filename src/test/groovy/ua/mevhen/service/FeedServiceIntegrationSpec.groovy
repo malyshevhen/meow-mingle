@@ -30,8 +30,8 @@ class FeedServiceIntegrationSpec extends AbstractIntegrationSpec {
             return userService.save(
                 new UserRegistration(
                     username: "User$it",
-                    email: "email$it@mail.com," +
-                        " Passw@rd$it"))
+                    email: "email$it@mail.com,",
+                    password: " Passw@rd$it"))
         }
 
         (1..5).each {

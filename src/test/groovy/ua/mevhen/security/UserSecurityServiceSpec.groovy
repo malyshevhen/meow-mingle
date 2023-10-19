@@ -24,7 +24,7 @@ class UserSecurityServiceSpec extends Specification {
             id: new ObjectId(),
             username: username,
             password: "testPassword",
-            role: "ROLE_USER"
+                roles: ["USER"]
         )
         userRepository.findByUsername(username) >> Optional.of(user)
 

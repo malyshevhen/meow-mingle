@@ -2,6 +2,7 @@ package ua.mevhen.service
 
 import groovy.util.logging.Slf4j
 import org.bson.types.ObjectId
+import org.springframework.security.crypto.password.PasswordEncoder
 import org.springframework.stereotype.Service
 import org.springframework.transaction.annotation.Transactional
 import ua.mevhen.dto.UserInfo
@@ -19,13 +20,16 @@ class UserServiceImpl implements UserService {
 
     private final UserRepository userRepository
     private final UserMapper userMapper
+    private final PasswordEncoder passwordEncoder
 
     UserServiceImpl(
-        UserRepository userRepository,
-        UserMapper userMapper
+            UserRepository userRepository,
+            UserMapper userMapper,
+            PasswordEncoder passwordEncoder
     ) {
         this.userRepository = userRepository
         this.userMapper = userMapper
+        this.passwordEncoder = passwordEncoder
     }
 
     @Override
@@ -38,7 +42,8 @@ class UserServiceImpl implements UserService {
             throw new UserAlreadyExistsException(message)
         }
         def userToSave = userMapper.toUser(regForm)
-        userToSave.role = Role.USER.value
+        userToSave.roles.add(Role.USER.value)
+        userToSave.password = passwordEncoder.encode(userToSave.password)
         def savedUser = userRepository.save(userToSave)
         log.info("Saved user with ID: ${ savedUser.id }")
         return userMapper.toUserInfo(savedUser)

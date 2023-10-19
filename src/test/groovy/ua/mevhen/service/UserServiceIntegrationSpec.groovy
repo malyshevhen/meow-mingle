@@ -36,7 +36,7 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
         def user = userRepository.findById(id).get()
 
         then:
-        user.role == 'ROLE_USER'
+        user.roles == ['USER'] as HashSet
         user.created != null
 
         when:

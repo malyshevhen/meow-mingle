@@ -29,7 +29,7 @@ class PostController implements PostsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> publishPost(PostRequest postRequest) {
         def username = SecurityContextHolder.context.authentication.name
         log.info("User '$username' is posting a new post")
@@ -38,7 +38,7 @@ class PostController implements PostsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> updatePost(String id, PostRequest request) {
         def username = SecurityContextHolder.context.authentication.name
         log.info("User '$username' is updating post with ID: $id")
@@ -47,7 +47,7 @@ class PostController implements PostsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> deletePost(String id) {
         def username = SecurityContextHolder.context.authentication.name
         log.info("User '$username' is deleting post with ID: $id")
@@ -56,7 +56,7 @@ class PostController implements PostsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> addComment(String postId, CommentRequest request) {
         def username = SecurityContextHolder.context.authentication.name
         log.info("Request to comment post with ID: $postId by user: $username")
@@ -65,7 +65,7 @@ class PostController implements PostsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<PageComments> getPostComments(String postId, Integer size, Integer page) {
         log.info("Request to retrieve posts comments with PostID: $postId")
         def pageable = PageRequest.of(page, size)
@@ -74,7 +74,7 @@ class PostController implements PostsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> updateComment(String commentId, CommentRequest request) {
         def username = SecurityContextHolder.context.authentication.name
         log.info("Request to update comment with ID: $commentId by user: $username")
@@ -83,7 +83,7 @@ class PostController implements PostsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> deleteCommentById(String commentId) {
         def username = SecurityContextHolder.context.authentication.name
         log.info("Request to delete comment with ID: $commentId by user: $username")

@@ -39,7 +39,7 @@ class User {
     @NotNull
     private String password
 
-    private String role
+    private Set<String> roles = new HashSet<>()
 
     @DocumentReference
     private Set<User> subscriptions = new HashSet<>()

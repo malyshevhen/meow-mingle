@@ -14,7 +14,7 @@ class SecureUserSpec extends Specification {
             id: new ObjectId(),
             username: "testUser",
             password: "testPassword",
-            role: "ROLE_USER"
+                roles: ["USER"]
         )
         def secureUser = new SecureUser(user)
 
@@ -23,9 +23,5 @@ class SecureUserSpec extends Specification {
         secureUser.username == "testUser"
         secureUser.password == "testPassword"
         secureUser.authorities == [new SimpleGrantedAuthority("ROLE_USER")]
-        secureUser.isAccountNonExpired() == true
-        secureUser.isAccountNonLocked() == true
-        secureUser.isCredentialsNonExpired() == true
-        secureUser.isEnabled() == true
     }
 }

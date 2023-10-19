@@ -31,7 +31,7 @@ class ReactionController implements ReactionsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> addLike(String postId) {
         def username = SecurityContextHolder.context.authentication.name
         def reaction = new Reaction(username, postId, LIKE)
@@ -41,7 +41,7 @@ class ReactionController implements ReactionsApi {
     }
 
     @Override
-    @PreAuthorize("hasRole('ROLE_USER')")
+    @PreAuthorize("hasRole('USER')")
     ResponseEntity<Void> removeLike(String postId) {
         def username = SecurityContextHolder.context.authentication.name
         def reaction = new Reaction(username, postId, UNLIKE)

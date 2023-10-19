@@ -14,7 +14,7 @@ class SecureUser implements UserDetails{
 
     @Override
     Collection<? extends GrantedAuthority> getAuthorities() {
-        return [new SimpleGrantedAuthority(this.user.role)]
+        return this.user.roles.collect { new SimpleGrantedAuthority("ROLE_$it") }
     }
 
     @Override

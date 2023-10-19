@@ -7,6 +7,7 @@ import io.swagger.v3.oas.annotations.tags.Tag
 import jakarta.validation.constraints.NotBlank
 import org.springframework.data.redis.core.RedisTemplate
 import org.springframework.security.access.prepost.PreAuthorize
+import org.springframework.web.bind.annotation.DeleteMapping
 import org.springframework.web.bind.annotation.PathVariable
 import org.springframework.web.bind.annotation.PostMapping
 import org.springframework.web.bind.annotation.RequestMapping
@@ -63,7 +64,7 @@ class SubscriptionController {
         description = 'Unsubscribe from another user by providing their user ID.',
         tags = ['SubscriptionController']
     )
-    @PostMapping('/unsubscribe/{userId}')
+    @DeleteMapping('/subscribe/{userId}')
     void unsubscribe(
         Principal principal,
         @PathVariable('userId') @Parameter(description = 'User ID of subscription') @NotBlank String subId

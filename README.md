@@ -39,6 +39,6 @@ All functionality in this API is thoroughly tested using Spock tests. You can ru
 ### Deployment
 You just need to download `docker-compose-full-image.yml` an run:
 ```sh
-	docker compose up
+	docker compose -f docker-compose-full-image.yml up 
 ```
 Image is hosted in Github regidtry.

@@ -4,27 +4,6 @@ spring:
   data:
     mongodb:
       uri: 'mongodb://localhost:27017/meow-mingle'
-    redis:
-      host: '127.0.0.1'
-      port: 6379
-
-subscription-task:
-  thread-pool:
-    thread-name-prefix: 'subscription-worker-'
-    core-pool-size: 2
-    max-pool-size: 4
-  worker:
-    timeout: 500
-    key-name: 'subscription-events'
-
-reaction-task:
-  thread-pool:
-    thread-name-prefix: 'reaction-worker-'
-    core-pool-size: 2
-    max-pool-size: 4
-  worker:
-    timeout: 500
-    key-name: 'reaction-events'
 
 logging:
   level:

@@ -1,29 +1,16 @@
 package ua.mevhen.mapper
 
-import org.springframework.stereotype.Component
+
 import ua.mevhen.domain.dto.PostRequest
 import ua.mevhen.domain.dto.PostResponse
 import ua.mevhen.domain.model.Post
+import ua.mevhen.domain.model.User
 
-@Component
-class PostMapper {
+abstract class PostMapper {
 
-    private final CommentMapper commentMapper
-    private final UserMapper userMapper
-
-    PostMapper(
-        CommentMapper commentMapper,
-        UserMapper userMapper
-    ) {
-        this.commentMapper = commentMapper
-        this.userMapper = userMapper
-    }
-
-    PostResponse toResponse(Post post) {
-        def likes = post.likes
-            .collect { userMapper.toUserInfo(it) }
-        def comments = post.comments
-            .collect { commentMapper.toResponse(it) }
+    static PostResponse toResponse(Post post) {
+        def likes = post.likes.collect { UserMapper.toUserInfo(it as User) }
+        def comments = post.comments.collect { CommentMapper.toResponse(it) }
 
         return new PostResponse(
             id: post.id.toString(),
@@ -36,9 +23,16 @@ class PostMapper {
         )
     }
 
-    Post toPost(PostRequest request) {
+    static Post toPost(String content) {
         return new Post(
-            content: request.content
+            content: content
+        )
+    }
+
+    static Post toPost(String content, User author) {
+        return new Post(
+                content: content,
+                author: author
         )
     }
 

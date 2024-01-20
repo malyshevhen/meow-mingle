@@ -4,24 +4,21 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.bson.types.ObjectId
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 import ua.mevhen.domain.dto.CommentRequest
 import ua.mevhen.exceptions.UserNotFoundException
+import ua.mevhen.security.SecurityConfig
 import ua.mevhen.service.CommentService
 
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 
-@SpringBootTest(webEnvironment = MOCK)
-@AutoConfigureMockMvc
+@WebMvcTest(CommentController)
+@Import(SecurityConfig)
 class CommentControllerSpec extends Specification {
-
-    private static final USER_NOT_FOUND_EXCEPTION
-        = new UserNotFoundException('PostNotFoundException')
 
     @Autowired
     MockMvc mockMvc
@@ -30,7 +27,7 @@ class CommentControllerSpec extends Specification {
     ObjectMapper objectMapper
 
     @SpringBean
-    CommentService commentService = Mock(CommentService)
+    CommentService commentService = Mock()
 
 
     @WithMockUser(username = 'John')
@@ -40,10 +37,10 @@ class CommentControllerSpec extends Specification {
         def commentRequest = new CommentRequest(content: "Sample comment")
 
         when:
-        def result = performPost(postId, commentRequest)
+        def response = performPost(postId, commentRequest)
 
         then:
-        result.response.status == 201
+        response.status == 201
     }
 
     @WithMockUser(username = 'John')
@@ -53,10 +50,10 @@ class CommentControllerSpec extends Specification {
         def commentRequest = new CommentRequest(content: "Updated comment")
 
         when:
-        def result = performPut(commentId, commentRequest)
+        def response = performPut(commentId, commentRequest)
 
         then:
-        result.response.status == 200
+        response.status == 200
     }
 
     @WithMockUser(username = 'John')
@@ -65,52 +62,48 @@ class CommentControllerSpec extends Specification {
         def commentId = new ObjectId().toString()
 
         when:
-        def result = performDelete(commentId)
+        def response = performDelete(commentId)
 
         then:
-        result.response.status == 204
+        response.status == 204
     }
 
     @WithMockUser(username = 'John')
-    def "When trying to perform  new comment, and #exception.message is thrown, expected status is: #httpStatus"(
-        Exception exception,
-        int httpStatus
-    ) {
+    def "When trying to perform  new comment, and exception is thrown, expected status is: 404"() {
         given:
-        def postId = new ObjectId().toString()
+        def postId = new ObjectId()
         def commentRequest = new CommentRequest(content: "Sample comment")
 
         when:
-        commentService.save('John', postId, commentRequest) >> { throw exception }
-        def result = performPost(postId, commentRequest)
+        commentService.save('John', postId, commentRequest) >> { throw new UserNotFoundException('PostNotFoundException') }
+        def response = performPost(postId.toString(), commentRequest)
 
         then:
-        result.response.status == httpStatus
-
-        where:
-        exception                      | httpStatus
-        USER_NOT_FOUND_EXCEPTION       | 404
+        response.status == 404
     }
 
     private def performPost(String postId, CommentRequest commentRequest) {
         mockMvc.perform(
-            post("/api/posts/comment/{postId}", postId)
-                .content(objectMapper.writeValueAsString(commentRequest))
-                .contentType("application/json"))
-            .andReturn()
+                post("/api/posts/comment/{postId}", postId)
+                        .content(objectMapper.writeValueAsString(commentRequest))
+                        .contentType("application/json"))
+                .andReturn()
+                .response
     }
 
     private def performPut(String commentId, CommentRequest commentRequest) {
         mockMvc.perform(
-            put("/api/posts/comment/$commentId")
-                .content(objectMapper.writeValueAsString(commentRequest))
-                .contentType("application/json"))
-            .andReturn()
+                put("/api/posts/comment/$commentId")
+                        .content(objectMapper.writeValueAsString(commentRequest))
+                        .contentType("application/json"))
+                .andReturn()
+                .response
     }
 
     private def performDelete(String commentId) {
         mockMvc.perform(delete("/api/posts/comment/{commentId}", commentId))
-            .andReturn()
+                .andReturn()
+                .response
     }
 
 }

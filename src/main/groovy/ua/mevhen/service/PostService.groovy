@@ -1,22 +1,22 @@
 package ua.mevhen.service
 
-import ua.mevhen.domain.dto.PostRequest
-import ua.mevhen.domain.dto.PostResponse
+
 import ua.mevhen.domain.model.Post
 
 interface PostService {
 
-    Post findById(String id)
+    Post findById(def id)
 
-    PostResponse save(String username, PostRequest request)
+    Post save(String username, String content)
 
-    PostResponse update(String id, PostRequest request, String userId)
+    Post update(def id, String content, String username)
 
-    PostResponse update(Post post)
+    Post update(Post post)
 
-    void delete(String id, String username)
+    void delete(def id, String username)
 
-    void addLike(String username, String postId)
+    void addLike(String username, def postId)
 
-    void removeLike(String username, String postId)
+    void removeLike(String username, def postId)
+
 }

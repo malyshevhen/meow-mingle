@@ -1,13 +1,35 @@
 package ua.mevhen.service
 
-import org.bson.types.ObjectId
 import org.springframework.beans.factory.annotation.Autowired
-import ua.mevhen.domain.dto.UserRegistration
+import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import org.testcontainers.containers.MongoDBContainer
+import org.testcontainers.spock.Testcontainers
+import spock.lang.Shared
+import spock.lang.Specification
+import ua.mevhen.domain.model.User
 import ua.mevhen.exceptions.UserAlreadyExistsException
 import ua.mevhen.exceptions.UserNotFoundException
 import ua.mevhen.repository.UserRepository
 
-class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
+import static org.testcontainers.utility.DockerImageName.parse
+
+@SpringBootTest
+@Testcontainers
+class UserServiceIntegrationSpec extends Specification {
+
+    @Shared
+    static final def MONGO = new MongoDBContainer(parse('mongo:6.0')).withExposedPorts(27017)
+
+    static {
+        MONGO.start()
+    }
+
+    @DynamicPropertySource
+    static void setMongoDbProperties(DynamicPropertyRegistry registry) {
+        registry.add('spring.data.mongodb.uri', MONGO::getReplicaSetUrl)
+    }
 
     @Autowired
     UserService userService
@@ -17,10 +39,10 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "test save operations"() {
         given:
-        def registration = new UserRegistration(
-            username: 'testUser',
-            email: 'test@example.com',
-            password: 'password123'
+        def registration = new User(
+                username: 'testUser',
+                email: 'test@example.com',
+                password: 'password123'
         )
 
         when:
@@ -29,18 +51,18 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
         then:
         savedUserInfo.username == 'testUser'
         savedUserInfo.id != null
-        !savedUserInfo.id.isBlank()
+        savedUserInfo.id != null
 
         when:
-        def id = new ObjectId(savedUserInfo.id)
+        def id = savedUserInfo.id
         def user = userRepository.findById(id).get()
 
         then:
-        user.role == 'USER'
+        user.role == 'ROLE_USER'
         user.created != null
 
         when:
-        userService.save(registration)
+        userService.save(user)
 
         then:
         thrown UserAlreadyExistsException
@@ -51,10 +73,10 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "test updateUsername operation"() {
         given:
-        def registration = new UserRegistration(
-            username: 'testUser',
-            email: 'test@example.com',
-            password: 'password123'
+        def registration = new User(
+                username: 'testUser',
+                email: 'test@example.com',
+                password: 'password123'
         )
 
         def savedUserInfo = userService.save(registration)
@@ -74,17 +96,17 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "test deleteById operation"() {
         given:
-        def registration = new UserRegistration(
-            username: 'testUser',
-            email: 'test@example.com',
-            password: 'password123'
+        def registration = new User(
+                username: 'testUser',
+                email: 'test@example.com',
+                password: 'password123'
         )
 
         def savedUserInfo = userService.save(registration)
         userService.deleteById(savedUserInfo.id)
 
         when:
-        userService.findById(savedUserInfo.id)
+        userService.findByUsername(savedUserInfo.username)
 
         then:
         thrown UserNotFoundException
@@ -92,16 +114,16 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
 
     def "test subscribe and unsubscribe operations"() {
         given:
-        def registration1 = new UserRegistration(
-            username: 'testUser1',
-            email: 'test@example.com',
-            password: 'password123'
+        def registration1 = new User(
+                username: 'testUser1',
+                email: 'test@example.com',
+                password: 'password123'
         )
 
-        def registration2 = new UserRegistration(
-            username: 'testUser2',
-            email: 'test@example.com',
-            password: 'password123'
+        def registration2 = new User(
+                username: 'testUser2',
+                email: 'test@example.com',
+                password: 'password123'
         )
 
         when:
@@ -131,8 +153,8 @@ class UserServiceIntegrationSpec extends AbstractIntegrationSpec {
         !user2.subscribers.contains(user1)
 
         cleanup:
-        userService.deleteById(user1.id.toString())
-        userService.deleteById(user2.id.toString())
+        userService.deleteById(user1.id)
+        userService.deleteById(user2.id)
     }
 
 }

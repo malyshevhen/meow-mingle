@@ -14,42 +14,49 @@ import java.time.LocalDate
 
 @Document(collection = 'post')
 @ToString(
-    includeFields = true,
-    excludes = [
-        'likes',
-        'comments'
-    ])
+        includeFields = true,
+        excludes = [
+                'likes',
+                'comments'
+        ])
 @EqualsAndHashCode(
-    includeFields = true,
-    excludes = [
-        'likes',
-        'comments',
-        'updated'
-    ])
-class Post {
+        includeFields = true,
+        excludes = [
+                'likes',
+                'comments',
+                'updated'
+        ])
+class Post implements Mappable<Post> {
 
     @MongoId
-    private ObjectId id
+    ObjectId id
 
     @DocumentReference
-    private User author
+    User author
 
-    private String content
-
-    @DocumentReference(lazy = true)
-    private Set<User> likes = new HashSet()
+    String content
 
     @DocumentReference(lazy = true)
-    private Set<Comment> comments = new HashSet<>()
+    Set<User> likes = new HashSet()
+
+    @DocumentReference(lazy = true)
+    Set<Comment> comments = new HashSet<>()
 
     @CreatedDate
-    private LocalDate created
+    LocalDate created
 
     @LastModifiedDate
-    private LocalDate updated
+    LocalDate updated
 
     @Version
-    private Long version
+    Long version
+
+    Post() {}
+
+    Post(User author, String content) {
+        this.author = author
+        this.content = content
+    }
 
     void addLike(User user) {
         this.likes.add(user)
@@ -64,7 +71,7 @@ class Post {
     }
 
     void removeComment(Comment comment) {
-        this.comments.removeIf {it.id == comment.id}
+        this.comments.removeIf { it.id == comment.id }
     }
 
     void updateComment(Comment comment) {

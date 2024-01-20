@@ -25,36 +25,44 @@ import java.time.LocalDate
         'subscribers',
         'updated'
     ])
-class User {
+class User implements Mappable {
 
     @MongoId
-    private ObjectId id
+    ObjectId id
 
     @NotNull
-    private String username
+    String username
 
     @NotNull
-    private String email
+    String email
 
     @NotNull
-    private String password
+    String password
 
-    private String role
+    String role
 
     @DocumentReference
-    private Set<User> subscriptions = new HashSet<>()
+    Set<User> subscriptions = new HashSet<>()
 
     @DocumentReference
-    private Set<User> subscribers = new HashSet<>()
+    Set<User> subscribers = new HashSet<>()
 
     @CreatedDate
-    private LocalDate created
+    LocalDate created
 
     @LastModifiedDate
-    private LocalDate updated
+    LocalDate updated
 
     @Version
-    private Long version
+    Long version
+
+    User() {}
+
+    User(String username, String email, String password) {
+        this.username = username
+        this.email = email
+        this.password = password
+    }
 
     void subscribe(User sub) {
         sub.addSubscriber(this)
@@ -73,5 +81,4 @@ class User {
     void removeSubscriber(User u) {
         this.subscribers.removeIf { it.id == u.id }
     }
-
 }

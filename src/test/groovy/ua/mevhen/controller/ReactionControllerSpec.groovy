@@ -3,59 +3,55 @@ package ua.mevhen.controller
 import org.bson.types.ObjectId
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
-import spock.lang.Retry
-import ua.mevhen.domain.model.User
-import ua.mevhen.service.AbstractIntegrationSpec
+import spock.lang.Specification
+import ua.mevhen.security.SecurityConfig
 import ua.mevhen.service.PostService
-import ua.mevhen.service.UserService
 
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.post
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status
 
-@AutoConfigureMockMvc
-class ReactionControllerSpec extends AbstractIntegrationSpec {
+@WebMvcTest(ReactionController)
+@Import([SecurityConfig])
+class ReactionControllerSpec extends Specification {
 
-    private static USERNAME = 'John'
-    private static POST_ID = new ObjectId().toString()
+    static final USERNAME = 'John'
+    static final POST_ID = new ObjectId()
 
     @Autowired
     MockMvc mockMvc
 
     @SpringBean
-    PostService postService = Mock(PostService)
+    PostService postService = Mock()
 
-    @SpringBean
-    UserService userService = Mock(UserService)
-
-    @Retry(count = 2)
     @WithMockUser(username = 'John')
     def "should add a like reaction"() {
         when:
-        def result = mockMvc.perform(post("/api/reaction/like/{postId}", POST_ID))
-        userService.findByUsername(USERNAME) >> new User()
-        Thread.sleep(100)
+        def response = mockMvc.perform(
+                post("/api/reaction/like/{postId}", POST_ID.toString()))
+                .andReturn()
+                .response
 
         then:
         1 * postService.addLike(USERNAME, POST_ID)
         0 * postService.removeLike(_, _)
-        result.andExpect(status().isOk())
+        response.status == 200
     }
 
-    @Retry(count = 2)
     @WithMockUser(username = "John")
     def "should remove a like reaction"() {
         when:
-        def result = mockMvc.perform(post("/api/reaction/unlike/{postId}", POST_ID))
-        userService.findByUsername(USERNAME) >> new User()
-        Thread.sleep(100)
+        def response = mockMvc.perform(delete("/api/reaction/like/{postId}", POST_ID))
+                .andReturn()
+                .response
 
         then:
         1 * postService.removeLike(USERNAME, POST_ID)
         0 * postService.addLike(_, _)
-        result.andExpect(status().isOk())
+        response.status == 200
     }
 
 }

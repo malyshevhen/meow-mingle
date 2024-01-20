@@ -1,60 +1,65 @@
 package ua.mevhen.controller
 
+import org.bson.types.ObjectId
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
-import org.springframework.test.web.servlet.result.MockMvcResultMatchers
 import spock.lang.Specification
-import ua.mevhen.domain.dto.UserInfo
+import ua.mevhen.domain.model.User
+import ua.mevhen.security.SecurityConfig
 import ua.mevhen.service.UserService
 
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.delete
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.put
-import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.jsonPath
 
-@SpringBootTest(webEnvironment = MOCK)
-@AutoConfigureMockMvc
+@WebMvcTest(UserController)
+@Import(SecurityConfig)
 class UserControllerSpec extends Specification {
 
     @Autowired
     MockMvc mockMvc
 
     @SpringBean
-    UserService userService = Mock(UserService)
+    UserService userService = Mock()
 
     @WithMockUser
     def "test updateUsername endpoint"() {
         given:
-        def userId = 'user123'
+        def userId = new ObjectId()
         def newUsername = 'newUsername'
-        def userInfo = new UserInfo(id: userId, username: newUsername)
+        def email = 'email@mail.com'
+        def password = 'password'
 
-        userService.updateUsername(userId, newUsername) >> userInfo
+        userService.updateUsername(userId, newUsername) >> new User(newUsername, email, password)
 
         when:
-        def result = mockMvc.perform(put("/api/user/$userId")
-            .param("username", newUsername)
-            .contentType('application/json'))
+        def response = mockMvc.perform(put("/api/user/${userId.toString()}")
+                .param("username", newUsername)
+                .contentType('application/json'))
+                .andReturn()
+                .response
 
         then:
-        result.andExpect(MockMvcResultMatchers.status().isOk())
-            .andExpect(jsonPath('$.id').value(userId))
-            .andExpect(jsonPath('$.username').value(newUsername))
+        response.status == 200
+        response.contentAsString.contains(/"username":"$newUsername"/)
+        response.contentAsString.contains(/"email":"$email"/)
+        response.contentAsString.contains(/"password":"$password"/)
     }
 
     @WithMockUser
     def "test delete endpoint"() {
         given:
-        def userId = 'user123'
+        def userId = new ObjectId()
 
         when:
-        def result = mockMvc.perform(delete("/api/user/$userId"))
+        def response = mockMvc.perform(delete("/api/user/${userId.toString()}"))
+                .andReturn()
+                .response
 
         then:
-        result.andExpect(MockMvcResultMatchers.status().isNoContent())
+        response.status == 204
     }
 }

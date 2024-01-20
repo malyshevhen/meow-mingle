@@ -23,9 +23,9 @@ class SecureUserSpec extends Specification {
         secureUser.username == "testUser"
         secureUser.password == "testPassword"
         secureUser.authorities == [new SimpleGrantedAuthority("ROLE_USER")]
-        secureUser.isAccountNonExpired() == true
-        secureUser.isAccountNonLocked() == true
-        secureUser.isCredentialsNonExpired() == true
-        secureUser.isEnabled() == true
+        secureUser.isAccountNonExpired()
+        secureUser.isAccountNonLocked()
+        secureUser.isCredentialsNonExpired()
+        secureUser.isEnabled()
     }
 }

@@ -1,22 +1,21 @@
 package ua.mevhen.service
 
-import ua.mevhen.domain.dto.UserInfo
-import ua.mevhen.domain.dto.UserRegistration
+
 import ua.mevhen.domain.model.User
 
 interface UserService {
 
     User findByUsername(String username)
 
-    UserInfo save(UserRegistration rerForm)
+    User save(User userToSave)
 
-    UserInfo updateUsername(String id, String username)
+    User updateUsername(def id, String username)
 
-    void deleteById(String id)
+    void deleteById(def id)
 
-    void subscribe(String username, String subId)
+    void subscribe(String username, def subId)
 
-    void unsubscribe(String username, String subId)
+    void unsubscribe(String username, def subId)
 
     boolean ifExists(String username)
 

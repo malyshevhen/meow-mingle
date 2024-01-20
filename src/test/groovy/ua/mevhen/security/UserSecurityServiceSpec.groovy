@@ -13,7 +13,7 @@ class UserSecurityServiceSpec extends Specification {
     UserRepository userRepository
 
     def setup() {
-        userRepository = Mock(UserRepository)
+        userRepository = Mock()
         securityService = new UserSecurityService(userRepository)
     }
 
@@ -21,10 +21,10 @@ class UserSecurityServiceSpec extends Specification {
         given:
         def username = "testUser"
         def user = new User(
-            id: new ObjectId(),
-            username: username,
-            password: "testPassword",
-            role: "ROLE_USER"
+                id: new ObjectId(),
+                username: username,
+                password: "testPassword",
+                role: "ROLE_USER"
         )
         userRepository.findByUsername(username) >> Optional.of(user)
 

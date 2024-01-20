@@ -8,18 +8,16 @@ import ua.mevhen.domain.model.User
 
 class UserMapperSpec extends Specification {
 
-    UserMapper userMapper = new UserMapper()
-
     def "test mapping UserRegistration to User"() {
         given:
         UserRegistration registration = new UserRegistration(
-            username: 'testUser',
-            email: 'test@example.com',
-            password: 'password123'
+                username: 'testUser',
+                email: 'test@example.com',
+                password: 'password123'
         )
 
         when:
-        User user = userMapper.toUser(registration)
+        User user = UserMapper.toUser(registration)
 
         then:
         user.username == registration.username
@@ -32,18 +30,18 @@ class UserMapperSpec extends Specification {
     def "test mapping User to UserInfo"() {
         given:
         def user = new User(
-            id: new ObjectId(),
-            username: 'testUser',
-            email: 'test@example.com',
-            password: 'password123'
+                id: new ObjectId(),
+                username: 'testUser',
+                email: 'test@example.com',
+                password: 'password123'
         )
 
         when:
-        UserInfo userInfo = userMapper.toUserInfo(user)
+        UserInfo userInfo = UserMapper.toUserInfo(user)
 
         then:
-        userInfo.id == user.id.toString()
-        userInfo.username == user.username
+        userInfo.id() == user.id.toString()
+        userInfo.username() == user.username
     }
 }
 

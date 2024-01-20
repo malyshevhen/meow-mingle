@@ -1,6 +1,6 @@
 package ua.mevhen.service
 
-import groovy.util.logging.Slf4j
+
 import org.bson.types.ObjectId
 import org.springframework.data.domain.Page
 import org.springframework.data.domain.Pageable
@@ -15,84 +15,79 @@ import ua.mevhen.mapper.CommentMapper
 import ua.mevhen.repository.CommentRepository
 
 @Service
-@Slf4j
 class CommentServiceImpl implements CommentService {
 
     private final CommentRepository commentRepository
     private final UserService userService
     private final PostService postService
-    private final CommentMapper commentMapper
 
-    CommentServiceImpl(
-        CommentRepository commentRepository,
-        UserService userService,
-        PostService postService,
-        CommentMapper commentMapper
-    ) {
+    CommentServiceImpl(CommentRepository commentRepository,
+                       UserService userService,
+                       PostService postService) {
         this.commentRepository = commentRepository
         this.userService = userService
         this.postService = postService
-        this.commentMapper = commentMapper
     }
 
     @Override
     @Transactional
-    CommentResponse save(String username, String postId, CommentRequest request) {
+    CommentResponse save(String username, def postId, CommentRequest request) {
+        if (postId instanceof String) {
+            postId = new ObjectId(postId)
+        }
         def post = postService.findById(postId)
-        def user = userService.findByUsername(username)
-        def comment = commentMapper.toComment(request)
-        comment.author = user
-        comment.post = post
-        post.addComment(comment)
+        def author = userService.findByUsername(username)
+        def commentToSave = CommentMapper.toComment(request, author, post)
 
-        def savedComment = commentRepository.save(comment)
+        def savedComment = commentRepository.save(commentToSave)
 
+        post.addComment(savedComment)
         postService.update(post)
 
-        return commentMapper.toResponse(savedComment)
+        return CommentMapper.toResponse(savedComment)
     }
 
     @Override
     @Transactional
-    CommentResponse update(String username, String commentId, CommentRequest request) {
+    CommentResponse update(String username, def commentId, CommentRequest request) {
+        if (commentId instanceof String) {
+            commentId = new ObjectId(commentId)
+        }
         def commentToUpdate = findById(commentId)
         if (commentToUpdate.author.username != username) {
-            def message = "Comment ID: ${ commentToUpdate.id } not canged. Permission denied"
-            log.error(message)
-            throw new PermissionDeniedException(message)
+            throw new PermissionDeniedException("Comment ID: ${commentToUpdate.id} not canged. Permission denied")
         }
-        commentToUpdate.content = request.content
+        commentToUpdate.content = request.content()
         def updatedComment = commentRepository.save(commentToUpdate)
 
-        return commentMapper.toResponse(updatedComment)
+        return CommentMapper.toResponse(updatedComment)
     }
 
     @Override
     @Transactional
-    void delete(String username, String commentId) {
+    void delete(String username, def commentId) {
+        if (commentId instanceof String) {
+            commentId = new ObjectId(commentId)
+        }
         def commentToDelete = findById(commentId)
         if (commentToDelete.author.username != username) {
-            def message = "Comment ID: ${ commentToDelete.id } not canged. Permission denied"
-            log.error(message)
-            throw new PermissionDeniedException(message)
+            throw new PermissionDeniedException("Comment ID: ${commentToDelete.id} not canged. Permission denied")
         }
         commentRepository.delete(commentToDelete)
     }
 
     @Override
-    Page<CommentResponse> getByPostId(String postId, Pageable pageable) {
+    Page<CommentResponse> getByPostId(def postId, Pageable pageable) {
+        if (postId instanceof String) {
+            postId = new ObjectId(postId)
+        }
         return commentRepository
-            .findByPostId(new ObjectId(postId), pageable)
-            .map(commentMapper::toResponse)
+                .findByPostId(postId, pageable)
+                .map(CommentMapper::toResponse)
     }
 
-    private Comment findById(String commentId) {
-        commentRepository.findById(new ObjectId(commentId))
-            .orElseThrow { ->
-                def message = "Comment with ID: $commentId not found."
-                log.error(message)
-                new CommentNotFoundException(message)
-            }
+    private Comment findById(ObjectId commentId) {
+        commentRepository.findById(commentId)
+                .orElseThrow { new CommentNotFoundException("Comment with ID: $commentId not found.") }
     }
-
 }

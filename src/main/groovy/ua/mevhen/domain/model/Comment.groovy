@@ -16,23 +16,22 @@ import java.time.LocalDate
 @EqualsAndHashCode(
     includeFields = true,
     excludes = ['updated'])
-class Comment {
+class Comment implements Mappable<Comment>{
 
     @MongoId
-    private ObjectId id
+    ObjectId id
 
     @DocumentReference(lazy = true)
-    private User author
+    User author
 
     @DocumentReference
-    private Post post
+    Post post
 
-    private String content
+    String content
 
     @CreatedDate
-    private LocalDate created
+    LocalDate created
 
     @LastModifiedDate
-    private LocalDate updated
-
+    LocalDate updated
 }

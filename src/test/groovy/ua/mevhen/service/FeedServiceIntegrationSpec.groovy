@@ -1,14 +1,36 @@
 package ua.mevhen.service
 
 import org.springframework.beans.factory.annotation.Autowired
+import org.springframework.boot.test.context.SpringBootTest
 import org.springframework.data.domain.PageRequest
+import org.springframework.test.context.DynamicPropertyRegistry
+import org.springframework.test.context.DynamicPropertySource
+import org.testcontainers.containers.MongoDBContainer
+import org.testcontainers.spock.Testcontainers
+import spock.lang.Shared
+import spock.lang.Specification
 import ua.mevhen.domain.dto.PostRequest
-import ua.mevhen.domain.dto.PostResponse
-import ua.mevhen.domain.dto.UserInfo
-import ua.mevhen.domain.dto.UserRegistration
-import ua.mevhen.service.subscription.SubscriptionService
+import ua.mevhen.domain.model.Post
+import ua.mevhen.domain.model.User
 
-class FeedServiceIntegrationSpec extends AbstractIntegrationSpec {
+import static org.testcontainers.utility.DockerImageName.parse
+
+@SpringBootTest
+@Testcontainers
+class FeedServiceIntegrationSpec extends Specification {
+
+    @Shared
+    static final def MONGO = new MongoDBContainer(parse('mongo:6.0'))
+            .withExposedPorts(27017)
+
+    static {
+        MONGO.start()
+    }
+
+    @DynamicPropertySource
+    static void setMongoDbProperties(DynamicPropertyRegistry registry) {
+        registry.add('spring.data.mongodb.uri', MONGO::getReplicaSetUrl)
+    }
 
     @Autowired
     FeedService feedService
@@ -19,25 +41,24 @@ class FeedServiceIntegrationSpec extends AbstractIntegrationSpec {
     @Autowired
     PostService postService
 
-    @Autowired
-    SubscriptionService subscriptionService
-
-    def users = new ArrayList<UserInfo>()
-    def posts = new ArrayList<PostResponse>()
+    def users = new ArrayList<User>()
+    def posts = new ArrayList<Post>()
 
     def setup() {
         users = (1..2).collect {
             return userService.save(
-                new UserRegistration(
-                    username: "User$it",
-                    email: "email$it@mail.com," +
-                        " Passw@rd$it"))
+                    new User(
+                            username: "User$it",
+                            email: "email$it@mail.com",
+                            password: " Passw@rd$it"
+                    )
+            )
         }
 
         (1..5).each {
             users.each { userInfo ->
-                def postRequest = new PostRequest(content: "test content: $it from ${ userInfo.username }")
-                posts.add(postService.save(userInfo.username, postRequest))
+                def postRequest = new PostRequest(content: "test content: $it from ${userInfo.username}")
+                posts.add(postService.save(userInfo.username, postRequest.content()))
             }
         }
     }

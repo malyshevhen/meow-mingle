@@ -4,30 +4,28 @@ import com.fasterxml.jackson.databind.ObjectMapper
 import org.bson.types.ObjectId
 import org.spockframework.spring.SpringBean
 import org.springframework.beans.factory.annotation.Autowired
-import org.springframework.boot.test.autoconfigure.web.servlet.AutoConfigureMockMvc
-import org.springframework.boot.test.context.SpringBootTest
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest
+import org.springframework.context.annotation.Import
 import org.springframework.security.test.context.support.WithMockUser
 import org.springframework.test.web.servlet.MockMvc
 import spock.lang.Specification
 import ua.mevhen.domain.dto.PostRequest
 import ua.mevhen.domain.dto.PostResponse
+import ua.mevhen.domain.model.Post
 import ua.mevhen.exceptions.PermissionDeniedException
 import ua.mevhen.exceptions.PostNotFoundException
+import ua.mevhen.security.SecurityConfig
 import ua.mevhen.service.PostService
 
-import static org.springframework.boot.test.context.SpringBootTest.WebEnvironment.MOCK
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*
 
-@SpringBootTest(webEnvironment = MOCK)
-@AutoConfigureMockMvc
+@WebMvcTest(PostController)
+@Import(SecurityConfig)
 class PostControllerSpec extends Specification {
 
-    private static final POST_NOT_FOUND_EXCEPTION
-        = new PostNotFoundException('PostNotFoundException')
-    private static final PERMISSION_DENIED_EXCEPTION
-        = new PermissionDeniedException('PermissionDeniedException')
-    private static final ILLEGAL_ARGUMENT_EXCEPTION
-        = new IllegalArgumentException('IllegalArgumentException')
+    static final POST_NOT_FOUND_EXCEPTION = new PostNotFoundException('PostNotFoundException')
+    static final PERMISSION_DENIED_EXCEPTION = new PermissionDeniedException('PermissionDeniedException')
+    static final ILLEGAL_ARGUMENT_EXCEPTION = new IllegalArgumentException('IllegalArgumentException')
 
     @Autowired
     MockMvc mockMvc
@@ -36,42 +34,43 @@ class PostControllerSpec extends Specification {
     ObjectMapper objectMapper
 
     @SpringBean
-    PostService postService = Mock(PostService)
+    PostService postService = Mock()
 
     @WithMockUser(username = 'John')
     def "test post endpoint and expect status 201"() {
         given:
-        def postRequest = new PostRequest(content: 'Test Content')
+        def content = 'Test Content'
+        def postRequest = new PostRequest(content)
 
         def postId = new ObjectId().toString()
-        def postResponse = new PostResponse(id: "$postId", content: 'Test Content')
+        def postResponse = new PostResponse(id: "$postId", content: content)
+
+        postService.save('John', content) >> new Post(null, content)
 
         when:
-        postService.save('John', postRequest) >> postResponse
-        def result = performPost(postRequest)
-        def responseContent = result.response.getContentAsString()
+        def response = performPost(postRequest)
+        def responseContent = response.getContentAsString()
         def actualResponse = objectMapper.readValue(responseContent, PostResponse)
 
         then:
-        result.response.status == 201
-        actualResponse.id == postId
-        actualResponse.content == 'Test Content'
+        response.status == 201
+        actualResponse.content() == content
     }
 
     @WithMockUser(username = 'John')
     def "When trying to save new post, and #exception.message is thrown, expected status is: #httpStatus"(
-        Exception exception,
-        int httpStatus
+            Exception exception,
+            int httpStatus
     ) {
         given:
         def postRequest = new PostRequest(content: 'Test Content')
 
         when:
-        postService.save('John', postRequest) >> { throw exception }
-        def result = performPost(postRequest)
+        postService.save('John', postRequest.content()) >> { throw exception }
+        def response = performPost(postRequest)
 
         then:
-        result.response.status == httpStatus
+        response.status == httpStatus
 
         where:
         exception                  | httpStatus
@@ -82,38 +81,38 @@ class PostControllerSpec extends Specification {
     @WithMockUser(username = 'John')
     def "test update endpoint and expect status 200"() {
         given:
-        def postRequest = new PostRequest(content: 'Updated Content')
+        def content = 'Updated Content'
+        def postRequest = new PostRequest(content: content)
 
-        def postId = new ObjectId().toString()
-        def postResponse = new PostResponse(id: postId, content: 'Updated Content')
+        def postId = new ObjectId()
+
+        postService.update(_, postRequest.content(), 'John') >> new Post(null, content)
 
         when:
-        postService.update(postId, postRequest, 'John') >> postResponse
-        def result = performPut(postId, postRequest)
-        def responseContent = result.response.getContentAsString()
+        def response = performPut(postId.toString(), postRequest)
+        def responseContent = response.getContentAsString()
         def actualResponse = objectMapper.readValue(responseContent, PostResponse)
 
         then:
-        result.response.status == 200
-        actualResponse.id == postId
-        actualResponse.content == 'Updated Content'
+        response.status == 200
+        actualResponse.content() == content
     }
 
     @WithMockUser(username = 'John')
     def "When trying to update post, and #exception.message is thrown, expected status is: #httpStatus"(
-        Exception exception,
-        int httpStatus
+            Exception exception,
+            int httpStatus
     ) {
         given:
-        def postId = new ObjectId().toString()
+        def postId = new ObjectId()
         def postRequest = new PostRequest(content: 'Test Content')
 
         when:
-        postService.update(postId, postRequest, 'John') >> { throw exception }
-        def result = performPut(postId, postRequest)
+        postService.update(postId, postRequest.content(), 'John') >> { throw exception }
+        def response = performPut(postId.toString(), postRequest)
 
         then:
-        result.response.status == httpStatus
+        response.status == httpStatus
 
         where:
         exception                   | httpStatus
@@ -129,27 +128,27 @@ class PostControllerSpec extends Specification {
 
         when:
         postService.delete(postId, 'John')
-        def result = performDelete(postId)
+        def response = performDelete(postId)
 
         then:
-        result.response.status == 204
+        response.status == 204
     }
 
     @WithMockUser(username = 'John')
     def "When trying to delete post, and #exception.message is thrown, expected status is: #httpStatus"(
-        Exception exception,
-        int httpStatus
+            Exception exception,
+            int httpStatus
     ) {
         given:
-        def postId = new ObjectId().toString()
+        def postId = new ObjectId()
 
         when:
         postService.delete(postId, 'John') >> { throw exception }
-        def result = performDelete(postId)
+        def response = performDelete(postId.toString())
 
 
         then:
-        result.response.status == httpStatus
+        response.status == httpStatus
 
         where:
         exception                   | httpStatus
@@ -160,24 +159,27 @@ class PostControllerSpec extends Specification {
 
     private def performPost(PostRequest postRequest) {
         mockMvc.perform(
-            post("/api/posts")
-                .contentType("application/json")
-                .content(objectMapper.writeValueAsString(postRequest)))
-            .andReturn()
+                post("/api/posts")
+                        .contentType("application/json")
+                        .content(objectMapper.writeValueAsString(postRequest)))
+                .andReturn()
+                .response
     }
 
     private def performPut(String postId, PostRequest postRequest) {
         mockMvc.perform(
-            put("/api/posts/$postId")
-                .contentType('application/json')
-                .content(objectMapper.writeValueAsString(postRequest)))
-            .andReturn()
+                put("/api/posts/$postId")
+                        .contentType('application/json')
+                        .content(objectMapper.writeValueAsString(postRequest)))
+                .andReturn()
+                .response
     }
 
     private def performDelete(String postId) {
         mockMvc.perform(
-            delete("/api/posts/$postId"))
-            .andReturn()
+                delete("/api/posts/$postId"))
+                .andReturn()
+                .response
     }
 
 }

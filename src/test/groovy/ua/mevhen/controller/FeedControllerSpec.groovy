@@ -21,8 +21,6 @@ import static org.springframework.test.web.servlet.request.MockMvcRequestBuilder
 @Import(SecurityConfig)
 class FeedControllerSpec extends Specification {
 
-    static final USER_NOT_FOUND_EXCEPTION = new UserNotFoundException('PostNotFoundException')
-
     @Autowired
     MockMvc mockMvc
 
@@ -63,25 +61,18 @@ class FeedControllerSpec extends Specification {
     }
 
     @WithMockUser(username = 'John')
-    def "When trying to get user's feed, and #exception.message is thrown, expected status is: #httpStatus"(
-            Exception exception,
-            int httpStatus
-    ) {
+    def "When trying to get user's feed, and exception is thrown, expected status is: 404"() {
         given:
         def size = 10
         def page = 0
         def pageable = PageRequest.of(page, size)
 
         when:
-        feedService.getFeed('John', pageable) >> { throw exception }
+        feedService.getFeed('John', pageable) >> { throw new UserNotFoundException('PostNotFoundException') }
         def response = performOwnerGet(size, page)
 
         then:
-        response.status == httpStatus
-
-        where:
-        exception                | httpStatus
-        USER_NOT_FOUND_EXCEPTION | 404
+        response.status == 404
     }
 
     private def performOwnerGet(int size, int page) {

@@ -42,9 +42,6 @@ class PostControllerSpec extends Specification {
         def content = 'Test Content'
         def postRequest = new PostRequest(content)
 
-        def postId = new ObjectId().toString()
-        def postResponse = new PostResponse(id: "$postId", content: content)
-
         postService.save('John', content) >> new Post(null, content)
 
         when:
